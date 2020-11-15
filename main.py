@@ -16,8 +16,10 @@ data_players = "data_players.txt"
 # party settings
 player_1 = Player(color="white", rate=2400)
 player_2 = Player(color="black", rate=2500)
+""" создаё играющих игроков для более наглядного отображения """
 
 first_party = Party(player_1, player_2, "30min")
+""" создаём экземплар партии """
 
 
 """Настраиваем основные параметры"""
@@ -49,7 +51,7 @@ def read_players(file_name):
 
 
 def main():
-    global counter, FPS, BLACK
+    global counter, FPS, BLACK, finished
     while finished == 0:
         """
         Рассматриваем разные этапы запуска программы:
@@ -153,6 +155,7 @@ def main():
                 if eevent.type == pygame.QUIT:
                     pass
                 elif eevent.type == pygame.MOUSEBUTTONDOWN:
+                    """ если нажата клавиша, то делигируем ответственность на objects.py """
                     print('Click! ', pygame.mouse.get_pos())
                     first_party.check_press(x=pygame.mouse.get_pos()[0], y=pygame.mouse.get_pos()[1])
 
@@ -161,7 +164,12 @@ def main():
 
             pygame.display.update()
             screen.fill(BLACK)
+
+            """ прверка окончания партии """
             finished = first_party.indicator
+
+    """ завершаем партию """
+    first_party.end()
 
 
 print(first_party.print())
@@ -177,6 +185,8 @@ extra actions:
 добавить режим одного игрока:
 вариант игры с компьютером 
 вариант игры по онлайну
+
+добавить кнопку по нажатию на которую можно сдаться
 
 """
 
