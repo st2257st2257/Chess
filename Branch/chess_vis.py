@@ -83,3 +83,33 @@ def field_mouse_check(field):
     x, y = pygame.mouse.get_pos()
     return (x > x0) and (x < x0 + field_size) and (
         y > y0) and (y < y0 + field_size)
+
+
+def write_text(text, coords, surface):
+    '''
+    Отображает текст *text* на поверхности *surface* с координатами *(x, y)*.
+    '''
+    myfont = pygame.font.SysFont('Arial', 40)
+    textsurface = myfont.render(text, False, (255, 255, 255))
+    x, y = textsurface.get_size()
+    surf = pygame.Surface(textsurface.get_size(), pygame.SRCALPHA)
+    surfscaled = pygame.Surface(
+            (x // 2, y // 2), pygame.SRCALPHA)
+    surf.blit(textsurface, (0, 0))
+    pygame.transform.smoothscale(
+            surf, (x // 2, y // 2), surfscaled)
+    surface.blit(surfscaled, coords)
+    
+    
+def show_moves(moves):
+    '''
+    Отображает массив ходов *moves*.
+    '''
+    a = 0
+    screen = get_screen()
+    size = (int(desk_x_coord), window_height // 2)
+    moves_surface = pygame.Surface(size, pygame.SRCALPHA)
+    for move in moves[::-1]:
+        write_text(move.text, (0, a * 25), moves_surface)
+    coords = (int(screen_width - desk_x_coord), 0)
+    screen.blit(moves_surface, coords)
