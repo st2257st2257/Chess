@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((screen_w_max, screen_h_max))
 
 # files setting
 data_file_name = "data_party.txt"
-data_players = "data_player.txt"
+data_players = "data_players.txt"
 
 
 # party settings
