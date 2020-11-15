@@ -1,5 +1,6 @@
 from SQL import *
 
+
 class Chess_Figure:
     pass
 

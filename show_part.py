@@ -1,14 +1,14 @@
-Show_CF():
+def show_cf():
     pass
 
 
-Show_Board():
+def show_board():
     pass
 
 
-Show_move():
+def show_move():
     pass
 
 
-Show_Party():
+def show_party():
     pass

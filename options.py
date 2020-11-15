@@ -24,4 +24,5 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 CF_width = board_width / 8
-""" ширина изображения шахматной фигуры на доске """
+CF_height = board_width / 8
+""" ширина и высота изображения шахматной фигуры на доске """
