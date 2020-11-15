@@ -1,2 +1,1 @@
-ufh,63;fggg,63;userffff,63;usergg\,63;userfgg,63;ааа,63;user,63;ask,18;d,4;c,3;b,2;a,1
-;user,0;user,0;user,0;user,0;user,0;user,0;user,0;user,0;user,0;user,0;user,0;user,0
+1.e4;c5 2.d4;cxd4 3.c3;Nf6 4.Bd3;dxc3
