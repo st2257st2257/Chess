@@ -18,6 +18,9 @@ player_1 = Player(color="white", rate=2400)
 player_2 = Player(color="black", rate=2500)
 """ создаё играющих игроков для более наглядного отображения """
 
+
+
+# FIXME: после добавление пользователей добавить обращение к игрокам партии
 first_party = Party(player_1, player_2, "30min")
 """ создаём экземплар партии """
 
@@ -34,7 +37,7 @@ print("data: ", data)
 base_font = pygame.font.Font(None, 32)
 
 
-counter = 0
+counter = 4
 # индикатор этапов партии
 
 
