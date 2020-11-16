@@ -24,11 +24,12 @@ def set_image(file):
     '''
     size = (int(field_size), int(field_size))
     image = pygame.image.load(file)
-    image = image.convert_alpha()
+    image = image.convert_alpha(
+    pygame.display.set_mode((window_width, window_height)))
     surfscaled = pygame.Surface(size, pygame.SRCALPHA)
     pygame.transform.smoothscale(image, size, surfscaled)
     return surfscaled
-    
+
 
 for figure in fig_images.keys():
     fig_images.update({figure : set_image(fig_images[figure][0])})
@@ -151,11 +152,11 @@ def event_handler(party, prior_flag):
         if event.type == pygame.QUIT:
             return (party, prior_flag, True)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            for field in party.fields.values():
+            for field in party.fields:
                 if field_mouse_check(field) and (prior_flag in field.figure):
                     for moves in field.get_possible_moves():
                         moves.lighten = True
-                    party.active_field_key = field
+                    party.active_field = field
                     return (party, prior_flag, False)
                 if field_mouse_check(field) and field.lighten:
                     party = field.move(party)
