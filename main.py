@@ -163,7 +163,7 @@ def main():
                     first_party.check_press(x=pygame.mouse.get_pos()[0], y=pygame.mouse.get_pos()[1])
 
             """ выводим доску """
-            show_party(screen, first_party)
+            first_party.show(screen)
 
             pygame.display.update()
             screen.fill(BLACK)
