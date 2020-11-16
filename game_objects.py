@@ -16,7 +16,7 @@ class Chess_Figure:
         self.potmoves = None
         self.image = None
         self.eaten = False
-    
+
 
     def move(self, newcoords, allies, enemies):
         """Перемещает фигуру на *newcoords*,
@@ -35,6 +35,7 @@ class Chess_Figure:
                     enemy.coords = None
             self.coords = newcoords
 
+
 """pawn = Chess_Figure('e2')
 rook = Chess_Figure('e3')
 enemies = [rook]
@@ -42,38 +43,6 @@ pawn.move('e3', enemies, [])
 print(rook.coords)
 print(pawn.coords)
 print(rook.eaten)"""
-
-
-
-
-class King(Chess_Figure):
-    """Король"""
-    pass
-
-
-class Queen(Chess_Figure):
-    """Ферзь"""
-    pass
-
-
-class Rook(Chess_Figure):
-    """Ладья"""
-    pass
-
-
-class Bishop(Chess_Figure):
-    """Слон"""
-    pass
-
-
-class Knight(Chess_Figure):
-    """Конь"""
-    pass
-
-
-class Pawn(Chess_Figure):
-    """Пешка"""
-    pass
 
 
 class Move:
@@ -90,7 +59,17 @@ class Player:
     def __init__(self, color, rate):
         self.color = color
         self.rate = rate
+
+
+class field():
+    '''
+    Конструктор класса поля, имеющего координаты *coords* и фигуру *figure*.
+    '''
+    def __init__(self, coords, figure):
+        self.x, self.y = coords
+        self.figure = figure
         
+
 
 class Party:
     pass
