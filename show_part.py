@@ -2,6 +2,8 @@
 import pygame
 import yaml
 
+FPS = 30
+
 window_width = 800
 
 window_height = 600
@@ -13,6 +15,8 @@ desk_x_coord = (window_width - window_height) / 2
 black = (0, 0, 0)
 white = (255, 255, 255)
 lighten = (0, 255, 255)
+
+clock = pygame.time.Clock()
 
 with open('chess_figs.yaml', 'r') as file:
     fig_images = yaml.load(file, Loader=yaml.Loader)
@@ -128,9 +132,12 @@ def draw_party(party):
     '''
     Прорисовка всех составляющих игры *party*.
     '''
+    fill()
     for field in party.fields.values():
         draw_field(field)
     show_moves(moves)
+    pygame.display.update()
+    clock.tick(FPS)
 
 
 def change_flag(prior_flag):
@@ -152,7 +159,7 @@ def event_handler(party, prior_flag):
         if event.type == pygame.QUIT:
             return (party, prior_flag, True)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            for field in party.fields:
+            for field in party.fields.values():
                 if field_mouse_check(field) and (prior_flag in field.figure):
                     for moves in field.get_possible_moves():
                         moves.lighten = True
