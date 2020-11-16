@@ -25,7 +25,7 @@ def set_image(file):
     size = (int(field_size), int(field_size))
     image = pygame.image.load(file)
     image = image.convert_alpha(
-        pygame.display.set_mode((window_width, window_height)))
+    pygame.display.set_mode((window_width, window_height)))
     surfscaled = pygame.Surface(size, pygame.SRCALPHA)
     pygame.transform.smoothscale(image, size, surfscaled)
     return surfscaled
