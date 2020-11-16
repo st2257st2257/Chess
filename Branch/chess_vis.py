@@ -1,5 +1,6 @@
 # coding: utf-8
 import pygame
+import yaml
 
 window_width = 800
 
@@ -8,6 +9,30 @@ window_height = 600
 field_size = window_height / 8
 
 desk_x_coord = (window_width - window_height) / 2
+
+black = (0, 0, 0)
+white = (255, 255, 255)
+lighten = (0, 255, 255)
+
+with open('chess_figs.yaml', 'r') as file:
+    fig_images = yaml.load(file, Loader=yaml.Loader)
+    
+def set_image(file):
+    '''
+    Создает поверхность с изображением из файла *file*. Размер поверхности
+    равен размеру поля.
+    '''
+    size = (int(field_size), int(field_size))
+    image = pygame.image.load(file)
+    image = image.convert_alpha()
+    surfscaled = pygame.Surface(size, pygame.SRCALPHA)
+    pygame.transform.smoothscale(image, size, surfscaled)
+    return surfscaled
+    
+
+for figure in fig_images.keys():
+    fig_images.update({figure : set_image(fig_images[figure][0])})
+
 
 def init():
     '''
@@ -29,7 +54,7 @@ def fill():
     Заливает главный экран белым цветом
     '''
     screen = get_screen()
-    screen.fill((255, 255, 255))
+    screen.fill(white)
 
 
 def quit():
@@ -38,29 +63,6 @@ def quit():
     '''
     pygame.quit()
 
-
-def set_figure_image(file):
-    '''
-    Создает поверхность с изображением из файла *file*. Размер поверхности
-    равен размеру поля.
-    '''
-    size = (int(field_size), int(field_size))
-    image = pygame.image.load(file)
-    image = image.convert_alpha()
-    surfscaled = pygame.Surface(size, pygame.SRCALPHA)
-    pygame.transform.smoothscale(image, size, surfscaled)
-    return surfscaled
-    
-    
-def draw_figure(figure):
-    '''
-    Отрисовывает шахматную фигуру *figure*.
-    '''
-    x = int(desk_x_coord + (figure.x - 1) * field_size)
-    y = int((9 - figure.y) *  field_size)
-    screen = get_screen()
-    screen.blit(figure.image, (x, y))
-    
 
 def draw_field(field):
     '''
@@ -71,7 +73,12 @@ def draw_field(field):
     x = int(desk_x_coord + (field.x - 1) * field_size)
     y = int((9 - field.y) *  field_size)
     rectan = (x, y, *size)
-    pygame.draw.rect(screen, field.color, rectan)
+    color_rgb = (field.x + field.y) % 2 * 255
+    color = (color_rgb, color_rgb, color_rgb)
+    if field.lighten:
+        color = lighten
+    pygame.draw.rect(screen, color, rectan)
+    screen.blit(fig_images[field.figure], (x, y))
     
     
 def field_mouse_check(field):
@@ -111,5 +118,48 @@ def show_moves(moves):
     moves_surface = pygame.Surface(size, pygame.SRCALPHA)
     for move in moves[::-1]:
         write_text(move.text, (0, a * 25), moves_surface)
+        a += 1
     coords = (int(screen_width - desk_x_coord), 0)
     screen.blit(moves_surface, coords)
+
+
+def draw_party(party):
+    '''
+    Прорисовка всех составляющих игры *party*.
+    '''
+    for field in party.fields.values():
+        draw_field(field)
+    show_moves(moves)
+
+
+def change_flag(prior_flag):
+    '''
+    Смена флага очередности.
+    '''
+    if prior_flag == 'white':
+        return 'black'
+    else:
+        return 'white'
+
+
+def event_handler(party, prior_flag):
+    '''
+    Обработчик событий. *party* --- игра. prior_flag --- флаг очередности.
+    Возвращает (игру после изменений, флаг очередности, флаг цикличности)
+    '''
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return (party, prior_flag, True)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for field in party.fields.values():
+                if field_mouse_check(field) and (prior_flag in field.figure):
+                    for moves in field.get_possible_moves():
+                        moves.lighten = True
+                    party.active_field_key = field
+                    return (party, prior_flag, False)
+                if field_mouse_check(field) and field.lighten:
+                    party = field.move(party)
+                    prior_flag = change_flag(prior_flag)
+                    return (party, prior_flag, False)
+                    
+            
