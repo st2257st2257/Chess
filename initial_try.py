@@ -3,13 +3,16 @@ from game_objects import *
 
 init()
 
-party = Party
 
 def main():
+    party = Party()
     prior_flag = 'white'
     finished = False
     while not finished:
-        party, prior_flag, finished = event_handler(party, prior_flag)
+        try:
+            party, prior_flag, finished = event_handler(party, prior_flag)
+        except Exception:
+            pass
         draw_party(party)
 main()
 quit()

@@ -52,6 +52,7 @@ class Field:
         self.coords = list(divmod(coords,10))
         self.x, self.y = divmod(coords,10)
         self.figuretype = figuretype
+        self.lighten = False
         if not self.figuretype == '':
             self.occupied = True # Занято ли поле фигурой
             self.figure = ChessFigure(figuretype)

@@ -23,7 +23,7 @@
 36: ''
 37: black_pawn
 38: black_bishop
-41: whtie_queen
+41: white_queen
 42: white_pawn
 43: ''
 44: ''
@@ -31,7 +31,7 @@
 46: ''
 47: black_pawn
 48: black_queen
-51: whtie_king
+51: white_king
 52: white_pawn
 53: ''
 54: ''

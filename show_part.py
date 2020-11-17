@@ -37,6 +37,7 @@ def set_image(file):
 
 for figure in fig_images.keys():
     fig_images.update({figure : set_image(fig_images[figure][0])})
+fig_images.update({'' : pygame.Surface((0, 0))})
 
 
 def init():
@@ -76,14 +77,14 @@ def draw_field(field):
     screen = get_screen()
     size = (int(field_size), int(field_size))
     x = int(desk_x_coord + (field.x - 1) * field_size)
-    y = int((9 - field.y) *  field_size)
+    y = int((8 - field.y) *  field_size)
     rectan = (x, y, *size)
-    color_rgb = (field.x + field.y) % 2 * 255
+    color_rgb = (field.x + field.y) % 2 * 150 + 100
     color = (color_rgb, color_rgb, color_rgb)
     if field.lighten:
         color = lighten
     pygame.draw.rect(screen, color, rectan)
-    screen.blit(fig_images[field.figure], (x, y))
+    screen.blit(fig_images[field.figuretype], (x, y))
     
     
 def field_mouse_check(field):
@@ -91,7 +92,7 @@ def field_mouse_check(field):
     Возвращает True если мышь в поле *field* и False если нет.
     '''
     x0 = desk_x_coord + (field.x - 1) * field_size
-    y0 = (9 - field.y) *  field_size
+    y0 = (8 - field.y) *  field_size
     x, y = pygame.mouse.get_pos()
     return (x > x0) and (x < x0 + field_size) and (
         y > y0) and (y < y0 + field_size)
@@ -135,7 +136,7 @@ def draw_party(party):
     fill()
     for field in party.fields.values():
         draw_field(field)
-    show_moves(moves)
+    #show_moves(moves)
     pygame.display.update()
     clock.tick(FPS)
 
@@ -158,14 +159,17 @@ def event_handler(party, prior_flag):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return (party, prior_flag, True)
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             for field in party.fields.values():
-                if field_mouse_check(field) and (prior_flag in field.figure):
-                    for moves in field.get_possible_moves():
-                        moves.lighten = True
+                if field_mouse_check(field) and (prior_flag in field.figuretype):
+                    steps = field.get_possible_steps(party)
+                    print(steps)
+                    for field in party.fields.value():
+                        if field in steps:
+                            field.lighten = True
                     party.active_field = field
                     return (party, prior_flag, False)
-                if field_mouse_check(field) and field.lighten:
+                elif field_mouse_check(field) and field.lighten:
                     party = field.move(party)
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
