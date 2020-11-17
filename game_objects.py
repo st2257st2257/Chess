@@ -7,12 +7,17 @@ with open('init_party.yaml', 'r') as file:
     init_party_dict = yaml.load(file, Loader=yaml.Loader)
 with open('chess_figs.yaml', 'r') as file:
     chess_dict = yaml.load(file, Loader=yaml.Loader)
+#print(chess_dict)
+desk_list = [] 
+for i in range(1,9):
+    for j in range(1,9):
+        desk_list.append([i,j])
 
 
 class Move:
     """docstring for Move"""
-    def __init__(self, figure, coords, newcoords, eatenfigure):
-        self.figure = figure
+    def __init__(self, figuretype, coords, newcoords, eatenfigure):
+        self.figuretype = figuretype
         self.coords = coords
         self.newcoords = newcoords
         self.eatenfigure = None
@@ -55,7 +60,7 @@ class Field:
             self.figure = None
     
 
-    def get_possible_steps(self, party):
+    def get_possible_steps(self, party): # TODO: Для правил нужен отдельный модуль, слишком много проверок
         '''
         Возвращает возможные ходы для фигуры в данной партии из данного поля
         '''
@@ -63,13 +68,34 @@ class Field:
         if not self.occupied:
             return possible_moves
         else:
-            pass
+            for move in chess_dict[self.figuretype][1]:
+                move = [self.coords[0] + move[0], self.coords[1] + move[1]]
+                if move in desk_list:
+                    possible_moves.append([self.coords[0] + move[0], self.coords[1] + move[1]])
+            return possible_moves
 
 
-    def move(self, party):
+    def move(self, party, newcoords):
         '''
         Перемещает фигуру из поля и возвращает новое состояние *party*
         '''
+        if self.occupied:
+            newcoords = newcoords[0]*10 + newcoords[1]
+            if newcoords in self.get_possible_steps(party):
+                if self.figuretype[0] == party.fields[newcoords].figuretype[0]:
+                    print("Field is occupied by ally figure")
+                elif not party.fields[newcoords].occupied:
+                    party.fields[newcoords].figure.eaten = True
+                    party.fields[newcoords].figure = self.figure
+                    self.occupied = False
+                    self.figuretype = ''
+                    self.figure = None
+                else:
+                    party.fields[newcoords].figure = self.figure
+                    self.occupied = False
+                    self.figuretype = ''
+                    self.figure = None
+
         return party
 
 
@@ -82,4 +108,5 @@ class Party:
             if not self.fields[key] == None: 
                 self.fields.update({key: Field(key, self.fields[key])})
         self.active_field = None
+        self.end_flag = False
         self.moves = []
