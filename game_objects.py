@@ -63,7 +63,7 @@ class Field:
 
     def get_possible_steps(self, party): # TODO: Для правил нужен отдельный модуль, слишком много проверок
         '''
-        Возвращает возможные ходы для фигуры в данной партии из данного поля
+        Возвращает возможные поля для хода для фигуры
         '''
         possible_moves = []
         if not self.occupied:
@@ -72,31 +72,35 @@ class Field:
             for move in chess_dict[self.figuretype][1]:
                 move = [self.coords[0] + move[0], self.coords[1] + move[1]]
                 if move in desk_list:
-                    possible_moves.append([self.coords[0] + move[0], self.coords[1] + move[1]])
+                    move = move[0]*10 + move[1]
+                    possible_moves.append(party.fields[move])
             return possible_moves
 
 
-    def move(self, party, newcoords):
+    def move(self, party, newfield):
         '''
-        Перемещает фигуру из поля и возвращает новое состояние *party*
+        Перемещает фигуру из поля в поле *newfield* и возвращает новое состояние *party*
         '''
-        if self.occupied:
-            newcoords = newcoords[0]*10 + newcoords[1]
-            if newcoords in self.get_possible_steps(party):
-                if self.figuretype[0] == party.fields[newcoords].figuretype[0]:
+        if self.occupied and newfield.occupied:
+            if newfield in self.get_possible_steps(party):
+                if self.figuretype[0] == newfield.figuretype[0]:
                     print("Field is occupied by ally figure")
-                elif not party.fields[newcoords].occupied:
-                    party.fields[newcoords].figure.eaten = True
-                    party.fields[newcoords].figure = self.figure
+                elif newfield.occupied:
+                    newfield.figure.eaten = True
+                    newfield.figure = self.figure
+                    newfield.figure.moved = True
+                    newfield.figuretype = self.figuretype
                     self.occupied = False
                     self.figuretype = ''
                     self.figure = None
-                else:
-                    party.fields[newcoords].figure = self.figure
-                    self.occupied = False
-                    self.figuretype = ''
-                    self.figure = None
-
+        elif self.occupied:
+            newfield.figure = self.figure
+            newfield.figure.moved = True
+            newfield.figuretype = self.figuretype
+            newfield.occupied = True
+            self.occupied = False
+            self.figuretype = ''
+            self.figure = None
         return party
 
 
@@ -111,3 +115,4 @@ class Party:
         self.active_field = None
         self.end_flag = False
         self.moves = []
+
