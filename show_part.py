@@ -163,15 +163,15 @@ def event_handler(party, prior_flag):
             for field in party.fields.values():
                 if field_mouse_check(field) and (prior_flag in field.figuretype):
                     steps = field.get_possible_steps(party)
-                    print(steps)
-                    for field in party.fields.value():
-                        if field in steps:
-                            field.lighten = True
+                    for field_ in party.fields.values():
+                        field_.lighten = False
+                        if field_ in steps:
+                            field_.lighten = True
                     party.active_field = field
                     return (party, prior_flag, False)
                 elif field_mouse_check(field) and field.lighten:
+                    print(prior_flag)
                     party = field.move(party)
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
                     
-            

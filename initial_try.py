@@ -11,7 +11,7 @@ def main():
     while not finished:
         try:
             party, prior_flag, finished = event_handler(party, prior_flag)
-        except Exception:
+        except TypeError:
             pass
         draw_party(party)
 main()
