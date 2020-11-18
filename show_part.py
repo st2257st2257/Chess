@@ -170,8 +170,11 @@ def event_handler(party, prior_flag):
                     party.active_field = field
                     return (party, prior_flag, False)
                 elif field_mouse_check(field) and field.lighten:
-                    print(prior_flag)
-                    party = field.move(party)
+                    party.acteive_field = None
+                    for field_ in party.fields.values():
+                        field_.lighten = False
+                        if field_ == party.active_field:
+                            party = field_.move(party, field)
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
                     
