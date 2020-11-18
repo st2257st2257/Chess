@@ -26,6 +26,8 @@ class Move:
 class Player:
     """docstring for Player"""
     def __init__(self, color, rate):
+        self.web_login = ""
+        self.web_password = ""
         self.color = color
         self.rate = rate
 
@@ -113,5 +115,6 @@ class Party:
                 self.fields.update({key: Field(key, self.fields[key])})
         self.active_field = None
         self.end_flag = False
+        self.web_id = 0
         self.moves = []
 
