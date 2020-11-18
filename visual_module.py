@@ -14,7 +14,7 @@ desk_x_coord = (window_width - window_height) / 2
 
 black = (0, 0, 0)
 white = (255, 255, 255)
-lighten = (0, 255, 255)
+lighten = (255, 218, 185)
 
 clock = pygame.time.Clock()
 
