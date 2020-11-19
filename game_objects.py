@@ -6,7 +6,7 @@ with open('init_party.yaml', 'r') as file:
     init_party_dict = yaml.load(file, Loader=yaml.Loader)
 with open('chess_figs.yaml', 'r') as file:
     chess_dict = yaml.load(file, Loader=yaml.Loader)
-#print(chess_dict)
+print(chess_dict)
 desk_list = [] 
 for i in range(1,9):
     for j in range(1,9):
