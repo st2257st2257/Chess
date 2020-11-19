@@ -70,16 +70,16 @@ def quit():
     pygame.quit()
 
 
-def draw_field(field):
+def draw_field(field, field_x, field_y):
     '''
     Отрисовывает поле *field* шахматной доски.
     '''
     screen = get_screen()
     size = (int(field_size), int(field_size))
-    x = int(desk_x_coord + (field.x - 1) * field_size)
-    y = int((8 - field.y) *  field_size)
+    x = int(desk_x_coord + (field_x - 1) * field_size)
+    y = int((8 - field_y) *  field_size)
     rectan = (x, y, *size)
-    color_rgb = (field.x + field.y) % 2 * 150 + 100
+    color_rgb = (field_x + field_y) % 2 * 150 + 100
     color = (color_rgb, color_rgb, color_rgb)
     if field.lighten:
         color = lighten
@@ -87,12 +87,12 @@ def draw_field(field):
     screen.blit(fig_images[field.figuretype], (x, y))
     
     
-def field_mouse_check(field):
+def field_mouse_check(field, field_x, field_y):
     '''
     Возвращает True если мышь в поле *field* и False если нет.
     '''
-    x0 = desk_x_coord + (field.x - 1) * field_size
-    y0 = (8 - field.y) *  field_size
+    x0 = desk_x_coord + (field_x - 1) * field_size
+    y0 = (8 - field_y) *  field_size
     x, y = pygame.mouse.get_pos()
     return (x > x0) and (x < x0 + field_size) and (
         y > y0) and (y < y0 + field_size)
@@ -134,8 +134,10 @@ def draw_party(party):
     Прорисовка всех составляющих игры *party*.
     '''
     fill()
-    for field in party.fields.values():
-        draw_field(field)
+    for field_num in party.fields.keys():
+        field = party.fields[field_num]
+        x, y = divmod(field_num, 10)
+        draw_field(field, x, y)
     #show_moves(moves)
     pygame.display.update()
     clock.tick(FPS)
@@ -160,21 +162,20 @@ def event_handler(party, prior_flag):
         if event.type == pygame.QUIT:
             return (party, prior_flag, True)
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            for field in party.fields.values():
-                if field_mouse_check(field) and (prior_flag in field.figuretype):
-                    steps = field.get_possible_steps(party)
+            for field_num in party.fields.keys():
+                field = party.fields[field_num]
+                x, y = divmod(field_num, 10)
+                if field_mouse_check(field, x, y) and (
+                    prior_flag in field.figuretype):
+                    steps = field.get_possible_steps(party, x, y)
                     for field_ in party.fields.values():
                         field_.lighten = False
                         if field_ in steps:
                             field_.lighten = True
                     party.active_field = field
                     return (party, prior_flag, False)
-                elif field_mouse_check(field) and field.lighten:
-                    party.acteive_field = None
-                    for field_ in party.fields.values():
-                        field_.lighten = False
-                        if field_ == party.active_field:
-                            party = field_.move(party, field)
+                elif field_mouse_check(field, x, y) and field.lighten:
+                    party = field.move(party)
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
                     
