@@ -26,80 +26,45 @@ class Move:
 class Player:
     """docstring for Player"""
     def __init__(self, color, rate):
+        self.web_login = ""
+        self.web_password = ""
         self.color = color
         self.rate = rate
 
 
-class ChessFigure:
-    """
-    Фигура для помещения в поле, 
-    имеет соответствующее новоеазвание *figure*,
-    а также атрибуты состояния *eaten* и *moved*
-    """
-    def __init__(self, figuretype):
-        self.figuretype = figuretype
-        self.eaten = False # Съедена ли фигура в данной
-        self.moved = False # Сделала ли фигура хотя бы один ход
-
-
-        
 class Field:
     '''
     Класса поля, имеющий координаты *coords* и фигуру *figure*
     '''
-    def __init__(self, coords, figuretype):
-        self.coords = list(divmod(coords,10))
-        self.x, self.y = divmod(coords,10)
+    def __init__(self, figuretype):
         self.figuretype = figuretype
         self.lighten = False
-        if not self.figuretype == '':
-            self.occupied = True # Занято ли поле фигурой
-            self.figure = ChessFigure(figuretype)
-        else:
-            self.occupied = False
-            self.figure = None
-    
 
-    def get_possible_steps(self, party): # TODO: Для правил нужен отдельный модуль, слишком много проверок
+    def get_possible_steps(self, party, x, y): # TODO: Для правил нужен отдельный модуль, слишком много проверок
         '''
         Возвращает возможные поля для хода для фигуры
         '''
         possible_moves = []
-        if not self.occupied:
-            return possible_moves
-        else:
-            for move in chess_dict[self.figuretype][1]:
-                move = [self.coords[0] + move[0], self.coords[1] + move[1]]
-                if move in desk_list:
-                    move = move[0]*10 + move[1]
-                    possible_moves.append(party.fields[move])
-            return possible_moves
+        for move in chess_dict[self.figuretype][1]:
+            move = [x + move[0], y + move[1]]
+            if move in desk_list:
+                move = move[0]*10 + move[1]
+                possible_moves.append(party.fields[move])
+        return possible_moves
 
 
-    def move(self, party, newfield):
+    def move(self, party):
         '''
         Перемещает фигуру из поля в поле *newfield* и возвращает новое состояние *party*
         '''
-        if self.occupied and newfield.occupied:
-            if newfield in self.get_possible_steps(party):
-                if self.figuretype[0] == newfield.figuretype[0]:
-                    print("Field is occupied by ally figure")
-                elif newfield.occupied:
-                    newfield.figure.eaten = True
-                    newfield.figure = self.figure
-                    newfield.figure.moved = True
-                    newfield.figuretype = self.figuretype
-                    self.occupied = False
-                    self.figuretype = ''
-                    self.figure = None
-        elif self.occupied:
-            newfield.figure = self.figure
-            newfield.figure.moved = True
-            newfield.figuretype = self.figuretype
-            newfield.occupied = True
-            self.occupied = False
-            self.figuretype = ''
-            self.figure = None
+        attack_figuretype = party.active_field.figuretype
+        for field in party.fields.values():
+            field.lighten = False
+            if field == party.active_field:
+                field.figuretype = ''
+            if field == self:
+                field.figuretype = attack_figuretype
+        party.active_field = None
         return party
 
 
@@ -109,9 +74,9 @@ class Party:
     def __init__(self):
         self.fields = init_party_dict
         for key in self.fields.keys():
-            if not self.fields[key] == None: 
-                self.fields.update({key: Field(key, self.fields[key])})
+            self.fields.update({key: Field(self.fields[key])})
         self.active_field = None
         self.end_flag = False
+        self.web_id = 0
         self.moves = []
 
