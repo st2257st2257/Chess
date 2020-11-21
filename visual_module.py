@@ -2,8 +2,6 @@
 import pygame
 import yaml 
 
-field_len = 400
-
 FPS = 30
 
 window_width = 1000
@@ -19,7 +17,6 @@ white = (255, 255, 255)
 lighten = (255, 218, 185)
 COLOR_ACTIVE = (0, 0, 0)
 COLOR_INACTIVE = (0, 0, 255)
-BUTTON_COLOR = (255, 99, 71)
 
 clock = pygame.time.Clock()
 
@@ -260,44 +257,3 @@ class button:
             pygame.draw.rect(get_screen(), self.color, self.rect)
         write_text(self.text, (self.x, self.y), get_screen(), self.font)
 
-
-def main_window():
-    '''
-    Creates main window for entering password and username. 
-    NOT FINISHED. NEED TO ADD FURTHER TASK.
-    '''
-    field_x = (window_width - field_len) // 2
-    field_y = window_height // 2 - 50
-    username_field = InputBox(field_x, field_y, field_len)
-    pass_field = InputBox(field_x, field_y + 100, field_len)
-    screen = get_screen()
-    finished = False
-    header_font = pygame.font.SysFont('Arial', 80)
-    button_font = pygame.font.SysFont('Arial', 50)
-    start_button = button(
-            field_x, window_height * 4 // 5, 'Play', button_font, BUTTON_COLOR)
-    text_font = pygame.font.SysFont('Arial', 40)
-    while not finished:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                finished = True
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.check():
-                    finished = True
-            username_field.event_handler(event)
-            pass_field.event_handler(event)
-        password = pass_field.text
-        pass_field.text = '*' * len(pass_field.text)
-        username_field.draw()
-        pass_field.draw()
-        start_button.draw()
-        pass_field.text = password
-        write_text('Password', (field_x, 
-            pass_field.y - 30), screen, text_font)
-        write_text('Username', (
-            field_x, username_field.y - 30), screen, text_font)
-        write_text('Phystech.Chess', (
-            field_x, window_height // 5), screen, header_font)
-        clock.tick(FPS)
-        pygame.display.update()
-        fill()

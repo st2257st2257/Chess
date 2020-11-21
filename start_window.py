@@ -1,6 +1,7 @@
 from visual_module import *
+from windows import *
 
 init()
 
-main_window()
+start_window()
 quit()
