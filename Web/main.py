@@ -4,50 +4,56 @@ from getpass import getpass
 from gettext import gettext
 import yaml
 
-"""for url in ['http://kriel.xyz/menu/News/']:
-    try:
-        response = requests.get(url)
-        print(response.text)
-        response.json()
-        # если ответ успешен, исключения задействованы не будут
-        response.raise_for_status()
-        print('Success!')
-    except HTTPError as http_err:
-        print(f'HTTP error occurred: {http_err}')  # Python 3.6
-    except Exception as err:
-        print(f'Other error occurred: {err}')  # Python 3.6
+
 """
-
-
-class WedUser:
-    def __init__(self, login, password):
-        self.login = login
-        self.password = password
-
-    def ddd(self):
-        pass
-
-
+Создание сессии от лица которй делаются GET и POST запросы
+"""
 session = requests.Session()
 
-# session.headers.update = {'X-Request-ID': 'c8b50f7200e75f2bd3759ce8b09faaf8'}
-# print(session.headers.update)
 
-# session.auth = ('username', getpass())
-# response = session.post("http://kriel.xyz/text/s_get.php", data={'text': 'aabbcc'}, timeout=1)
-# response = session.post("http://kriel.xyz/text/s_get.php", data={'text': 'aabbcc'}, timeout=1)
-# print(response.headers)
-# print(response.json())
+def check_player(login, password):
+    """
+    Проверяет наличие пользователя в базе данных
+    и возвращет его id если он есть, 0 -в противном случае
+    """
+    local_response = session.get("http://kriel.xyz/Chess/php/check_player.php",
+                                 data={'login': login, 'password': password},
+                                 timeout=1)
+    return int(str(local_response.content)[2:-1:])
 
-
+"""
+Добавление игрока вы базу данных(таблицу chess_players) с параметрами:
+Name	    Type	        CollationAttributes		Default	
+idPrimary	int(11)			No      	            None		AUTO_INCREMENT	
+login	    varchar(255)	utf8_unicode_ci  		No	None		
+password	varchar(255)	utf8_unicode_ci	    	No	None	
+rate	    int(11)			No	                    None				
+Если такой пользователь уже существует, то возвращаемое значение 1
+Если пользователя нет, то возвращаемое значение 0
+"""
 def add_player(login, password):
-    # FIXME: добавить проверку наличия пользователя в БД
-    local_response = session.post("http://kriel.xyz/Chess/php/add_player.php",
-                                  data={'login': login, 'password': password},
-                                  timeout=1)
-    print("Player added: " + str(local_response.content))
-
-
+    if check_player(login, password):
+        return 0
+    else:
+        local_response = session.post("http://kriel.xyz/Chess/php/add_player.php",
+                                     data={'login': login, 'password': password},
+                                      timeout=1)
+        return 1  # int(str(local_response.content)[3:-1:])
+    
+        
+"""
+Создаёт партию по двум лгинам и времени игры:
+запись на сервер новой строчки в таблицу chess с параметрами:
+	Name	Type	            CollationAttributes	    	Default
+	1	    idPrimary	        int(11)			            No	None		AUTO_INCREMENT	
+	2	    party_figures	    text	utf8_unicode_ci		Yes				
+	3	    party_moves	text	utf8_unicode_ci		        Yes				
+	4	    player_white_login	varchar(255)	            utf8_unicode_ci		
+	5	    player_black_login	varchar(255)	            utf8_unicode_ci			
+	6	    time	            int(11)			            None			
+	7	    move_number     	int(11)			            0			
+	8   	finished
+""""
 def create_new_party(player_1_login, player_2_login, time):
     # FIXME: добавить проверку наличия пользователей в базе данных
     local_response = session.post("http://kriel.xyz/Chess/php/create_party.php",
@@ -57,6 +63,11 @@ def create_new_party(player_1_login, player_2_login, time):
     return int(str(local_response.content)[3:-1:])
 
 
+
+"""
+Обновляет данные на сервере по ямл файлу:
+на вход подаётся имя файла и ID базы данных
+"""
 def update_figures(party_id=10, yaml_name="init_party.yaml"):
     figures_data_string = ""
     with open(yaml_name, 'r') as file:
@@ -69,6 +80,10 @@ def update_figures(party_id=10, yaml_name="init_party.yaml"):
     print(str(local_response.content))
 
 
+    
+"""
+Получение фигур из бызы данных словарь (возвращение словарая)
+"""
 def get_figures(party_id=10):
     # FIXME: добавить умную проверку корректности строки
     local_response = session.post("http://kriel.xyz/Chess/php/get_figures.php",
@@ -82,17 +97,8 @@ def get_figures(party_id=10):
         print("List index out of range in 77 string")
 
 
-def check_player(login, password):
-    """
-    Проверяет наличие пользователя в базе данных
-    и возвращет его id если он есть, 0 -в противном случае
-    """
-    local_response = session.get("http://kriel.xyz/Chess/php/check_player.php",
-                                 data={'login': login, 'password': password},
-                                 timeout=1)
-    return int(str(local_response.content)[2:-1:])
 
-
+"""Получение последнего номера хода из БД"""
 def get_move_number(party_id):
     """
     Проверяет изменённость данных на сервере:
@@ -105,8 +111,15 @@ def get_move_number(party_id):
     return int(str(local_response.content)[2:-1:])
 
 
+
 def add_move(party_id=99, string="11-11"):
-    """
+    """Добавление хода в соблюдённом формате:
+    AB-CD
+    Где:
+    A - Номер колонки начальной позиции (считая слева)
+    B - Номер ряда начальной позиции (считая сверху (так надо))
+    C - Номер колонки конечной позиции (считая слева)
+    D - Номер ряда конечной позиции (считая сверху (так надо))
     Вносит изменения в базу данны:
     1) в последовательность ходов добавляет ход
     2) увеличивает номер хода на 1
@@ -126,23 +139,27 @@ def get_moves(party_id):
     pass
 
 
-# add_player(input('Login: '), getpass())
 
 """
-
 Программа ждёт изменения хода на сервере
 и не даёт пользователю делать ход.  
 Когда ход на сервере меняется , программа обновляет данные 
 и предлагает ввести значения вида ХХ-ХХ.
 Когда значения введены, отправляет данные на
 сервер и ЦИКЛ СНОВА
-
-
+-пробная версия программы 
+-использовать для разработки ивэнт мэреджера
 """
-move_number = get_move_number(99)
-party = 99
-color = int(input("0-white, 1-black: "))
 
+
+party = 476  # Дефолтный ID партии строка с этим  ID имеет вид:
+# 476   11,;21,;31,;41,;51,;61,;71,;81,black_rook;12,;22,;...    55-57;66-78;54-66;62-54;41-62;22-41;43-22;51-43;63...
+# xfgsdfg     wait   5   31   0
+move_number = get_move_number(party)
+
+# Создаём партию если пользователь играет беслыми и вступаем в партияю если пользователь играет чёрными
+# начтраиваем индетефикатор партии
+color = int(input("0-white, 1-black: "))
 if color:
     party = int(input("Enter party id: "))
 else:
@@ -156,9 +173,13 @@ def main():
     global move_number, color, party
     count = 0
     while (count < 1000) & not_finished:
-        if (get_move_number(party) == move_number) or ((color == 1) and (get_move_number(party) == 1)):
+        """
+        ЕСЛИ пользователь играет чёрными и первый ход ИЛИ ЕСЛИ пользователь сделал жод ЖДЁМ
+        """
+        if (get_move_number(party) == move_number) or ((color == 1) and (get_move_number(party) == 0)):
             print("<Waiting>")
         else:
+            """Заставляем пользователя ввести ход"""
             add_move(party, input("Enter your move(XX-XX): "))
             move_number = get_move_number(party)
             print("Waiting for enemy move...")
@@ -168,9 +189,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# create_new_party(input('Login_white: '), input('Login_black: '), 5)
-# print(update_figures(50))
-
-# requests.post("http://kriel.xyz/text/s_get.php", data={'text': 'aabbcc'}, timeout=1)
