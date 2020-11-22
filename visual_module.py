@@ -4,9 +4,9 @@ import yaml
 
 FPS = 30
 
-window_width = 1000
+window_width = 1600
 
-window_height = 600
+window_height = 900
 
 field_size = window_height / 8
 
@@ -72,7 +72,7 @@ def quit():
     pygame.quit()
 
 
-def draw_field(field, field_x, field_y):
+def draw_field(field, field_x, field_y, hilighting):
     '''
     Отрисовывает поле *field* шахматной доски.
     '''
@@ -83,7 +83,7 @@ def draw_field(field, field_x, field_y):
     rectan = (x, y, *size)
     color_rgb = (field_x + field_y) % 2 * 150 + 100
     color = (color_rgb, color_rgb, color_rgb)
-    if field.lighten:
+    if field.lighten and hilighting:
         color = lighten
     pygame.draw.rect(screen, color, rectan)
     screen.blit(fig_images[field.figuretype], (x, y))
@@ -131,55 +131,76 @@ def show_moves(moves):
     screen.blit(moves_surface, coords)
 
 
-def draw_party(party):
+def draw_party_user_1(party):
     '''
     Прорисовка всех составляющих игры *party*.
     '''
-    fill()
-    for field_num in party.fields.keys():
-        field = party.fields[field_num]
-        x, y = divmod(field_num, 10)
-        draw_field(field, x, y)
-    #show_moves(moves)
-    pygame.display.update()
-    clock.tick(FPS)
-
-
-def change_flag(prior_flag):
-    '''
-    Смена флага очередности.
-    '''
-    if prior_flag == 'white':
-        return 'black'
+    if party.user1_color == 'white':
+        fill()
+        for field_num in party.fields.keys():
+            field = party.fields[field_num]
+            x, y = divmod(field_num, 10)
+            hilighting = ('white' == party.priority_flag)
+            draw_field(field, x, y, hilighting)
+        pygame.display.update()
+        clock.tick(FPS)
     else:
-        return 'white'
+        fill()
+        for field_num in party.fields.keys():
+            field = party.fields[field_num]
+            x, y = divmod(field_num, 10)
+            x = 8 - x
+            hilighting = ('black' == party.priority_flag)
+            draw_field(field, x, y, hilighting)
+        pygame.display.update()
+        clock.tick(FPS)
 
 
-def event_handler(party, prior_flag):
+def draw_party_user_2(party):
+    '''
+    Прорисовка всех составляющих игры *party*.
+    '''
+    if party.user2_color == 'white':
+        fill()
+        for field_num in party.fields.keys():
+            field = party.fields[field_num]
+            x, y = divmod(field_num, 10)
+            hilighting = ('white' == party.priority_flag)
+            draw_field(field, x, y, hilighting)
+        pygame.display.update()
+        clock.tick(FPS)
+    else:
+        fill()
+        for field_num in party.fields.keys():
+            field = party.fields[field_num]
+            x, y = divmod(field_num, 10)
+            x = 8 - x
+            hilighting = ('black' == party.priority_flag)
+            draw_field(field, x, y, hilighting)
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def event_handler(party):
     '''
     Обработчик событий. *party* --- игра. prior_flag --- флаг очередности.
     Возвращает (игру после изменений, флаг очередности, флаг цикличности)
     '''
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            return (party, prior_flag, True)
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            for field_num in party.fields.keys():
-                field = party.fields[field_num]
-                x, y = divmod(field_num, 10)
-                if field_mouse_check(field, x, y) and (
-                    prior_flag in field.figuretype):
-                    steps = field.get_possible_steps(party, x, y)
-                    for field_ in party.fields.values():
-                        field_.lighten = False
-                        if field_ in steps:
-                            field_.lighten = True
-                    party.active_field = field
-                    return (party, prior_flag, False)
-                elif field_mouse_check(field, x, y) and field.lighten:
-                    party = field.move(party)
-                    prior_flag = change_flag(prior_flag)
-                    return (party, prior_flag, False)
+    for field_num in party.fields.keys():
+        field = party.fields[field_num]
+        x, y = divmod(field_num, 10)
+        if field_mouse_check(field, x, y) and (
+            party.prior_flag in field.figuretype):
+            steps = field.get_possible_steps(party, x, y)
+            for field_ in party.fields.values():
+                field_.lighten = False
+                if field_ in steps:
+                    field_.lighten = True
+                party.active_field = field
+                return party
+        elif field_mouse_check(field, x, y) and field.lighten:
+            party = field.move(party)
+            return party
                     
 class InputBox:
     '''
