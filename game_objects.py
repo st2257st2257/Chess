@@ -40,7 +40,7 @@ class Field:
         self.figuretype = figuretype
         self.lighten = False
 
-    def get_possible_steps(self, party, x, y): # TODO: Для правил нужен отдельный модуль, слишком много проверок
+    def get_possible_moves(self, party, x, y): # TODO: Для правил нужен отдельный модуль, слишком много проверок
         '''
         Возвращает возможные поля для хода для фигуры
         '''
@@ -48,8 +48,7 @@ class Field:
         for move in chess_dict[self.figuretype][1]:
             move = [x + move[0], y + move[1]]
             if move in desk_list:
-                move = move[0]*10 + move[1]
-                possible_moves.append(party.fields[move])
+                possible_moves.append(party.fields[tuple(move)])
         return possible_moves
 
 
@@ -61,7 +60,7 @@ class Field:
         for field in party.fields.values():
             field.lighten = False
             if field == party.active_field:
-                field.figuretype = ''
+                field.figuretype = 'empty'
             if field == self:
                 field.figuretype = attack_figuretype
         party.active_field = None

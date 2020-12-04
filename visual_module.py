@@ -39,7 +39,7 @@ def set_image(file):
 
 for figure in fig_images.keys():
     fig_images.update({figure : set_image(fig_images[figure][0])})
-fig_images.update({'' : pygame.Surface((0, 0))})
+fig_images.update({'empty' : pygame.Surface((0, 0))})
 
 
 def init():
@@ -138,7 +138,7 @@ def draw_party(party):
     fill()
     for field_num in party.fields.keys():
         field = party.fields[field_num]
-        x, y = divmod(field_num, 10)
+        x, y = field_num
         draw_field(field, x, y)
     #show_moves(moves)
     pygame.display.update()
@@ -166,10 +166,10 @@ def event_handler(party, prior_flag):
         elif event.type == pygame.MOUSEBUTTONDOWN:
             for field_num in party.fields.keys():
                 field = party.fields[field_num]
-                x, y = divmod(field_num, 10)
+                x, y = field_num
                 if field_mouse_check(field, x, y) and (
                     prior_flag in field.figuretype):
-                    steps = field.get_possible_steps(party, x, y)
+                    steps = field.get_possible_moves(party, x, y)
                     for field_ in party.fields.values():
                         field_.lighten = False
                         if field_ in steps:
