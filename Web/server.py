@@ -51,49 +51,70 @@ while True:
         # 11: check_user_party(472, "zvzvzs")
         # 12: check_user_lp('ask', 'srt')
         # 13: check_flag(472, "zvzvzs")
+        # 14: create_user()
+        # 15: execute_sql(string)
+        # 16: get_moves(472)
         
         function_number = data[0]
         param_list = data[1]
+        res = None
         
-        
-        if function_number == 1:
-            res = add_move(param_list[0], param_list[1] + ";")
+        try: 
+            if function_number == 1:
+                res = add_move(param_list[0], param_list[1] + ";")
+                
+            elif function_number == 2:
+                res = create_party(param_list[0], param_list[1], param_list[2])
+                
+            elif function_number == 3:
+                res = get_last_move(param_list[0])
+                
+            elif function_number == 4:
+                res = get_party_figures(param_list[0])
+                
+            elif function_number == 5:
+                res = update_party_figures(param_list[0], param_list[1])
+                
+            elif function_number == 6:
+                res = set_white(param_list[0], param_list[1])
+                
+            elif function_number == 7:
+                res = set_black(param_list[0], param_list[1])
+                
+            elif function_number == 8:
+                res = get_white(param_list[0])
+                
+            elif function_number == 9:
+                res = get_black(param_list[0])
+                
+            elif function_number == 10:
+                res = check_user(param_list[0])
+                
+            elif function_number == 11:
+                res = check_user_party(param_list[0], param_list[1])
+                
+            elif function_number == 12:
+                res = check_user_lp(param_list[0], param_list[1])
+                
+            elif function_number == 13:
+                res = check_flag(param_list[0], param_list[1])
             
-        elif function_number == 2:
-            res = create_party(param_list[0], param_list[1], param_list[1])
+            elif function_number == 14:
+                res = create_user(param_list[0], param_list[1])
+                
+            elif function_number == 15:
+                res = execute_sql(param_list[0], param_list[1])
+                
+            elif function_number == 16:
+                res = get_moves(param_list[0])
+                
+            elif function_number == 17:
+                res = get_last_move_number(param_list[0])
+                
+                    
+        except Exception:
+            res = "Error in DB access"
             
-        elif function_number == 3:
-            res = get_last_move(param_list[0])
-            
-        elif function_number == 4:
-            res = get_party_figures(param_list[0])
-            
-        elif function_number == 5:
-            res = update_party_figures(param_list[0], param_list[1])
-            
-        elif function_number == 6:
-            res = set_white(param_list[0], param_list[1])
-            
-        elif function_number == 7:
-            res = set_black(param_list[0], param_list[1])
-            
-        elif function_number == 8:
-            res = get_white(param_list[0])
-            
-        elif function_number == 9:
-            res = get_black(param_list[0])
-            
-        elif function_number == 10:
-            res = check_user(param_list[0])
-            
-        elif function_number == 11:
-            res = check_user_party(param_list[0], param_list[1])
-            
-        elif function_number == 12:
-            res = check_user_lp(param_list[0], param_list[1])
-            
-        elif function_number == 13:
-            res = check_flag(param_list[0], param_list[1])
         cancel()
         print()
         try:
