@@ -49,7 +49,40 @@ def get_moves(field, party, x, y):
                 break 
         return diag_moves
     def get_dir_moves(field, party, x, y):
-        pass
+        dir_moves = []
+        for i in range(1,9):
+            if (check(x+i, y) and 
+                    party.fields[(x+i, y)].figuretype[0] != case[0]):
+                dir_moves.append(party.fields[(x+i, y)])
+                if party.fields[(x+i, y)].figuretype != 'empty':
+                    break
+            else: 
+                break
+        for i in range(1,9):
+            if (check(x-i, y) and 
+                    party.fields[(x-i, y)].figuretype[0] != case[0]):
+                dir_moves.append(party.fields[(x-i, y)])
+                if party.fields[(x-i, y)].figuretype != 'empty':
+                    break
+            else: 
+                break
+        for i in range(1,9):
+            if (check(x, y+i) and 
+                    party.fields[(x, y+i)].figuretype[0] != case[0]):
+                dir_moves.append(party.fields[(x, y+i)])
+                if party.fields[(x, y+i)].figuretype != 'empty':
+                    break
+            else: 
+                break
+        for i in range(1,9):
+            if (check(x, y-i) and 
+                    party.fields[(x, y-i)].figuretype[0] != case[0]):
+                dir_moves.append(party.fields[(x, y-i)])
+                if party.fields[(x, y-i)].figuretype != 'empty':
+                    break
+            else: 
+                break 
+        return dir_moves
 
     possible_moves = []
     case = field.figuretype # Для короткого обращения к строке figuretype поля
@@ -88,5 +121,10 @@ def get_moves(field, party, x, y):
 
     if 'bishop' in case:
         possible_moves = get_diag_moves(field, party, x, y)
-    print(case, ':', possible_moves)
+
+    if 'rook' in case:
+        possible_moves = get_dir_moves(field, party, x, y)
+
+    if 'queen' in case:
+        possible_moves = get_diag_moves(field, party, x, y) + get_dir_moves(field, party, x, y)
     return possible_moves
