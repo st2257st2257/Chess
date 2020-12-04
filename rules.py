@@ -8,6 +8,7 @@ def check(x, y):
     else:
         return False
 
+
 def get_moves(field, party, x, y):
     '''
     Возвращает список доступных для хода *field* полей из *party.fields*,
@@ -90,4 +91,26 @@ def get_moves(field, party, x, y):
     if 'queen' in case:
         possible_moves = get_diag_moves(field, party, x, y) + get_dir_moves(field, party, x, y)
     return possible_moves
+
+
+def get_king_pos(color, party):
+    '''
+    Возвращает поле с королём цвета *color* в партии *party*
+    '''
+    for field in party.fields.values():
+        if 'king' in field.figuretype and color in field.figuretype:
+            return field
+
+
+def get_attacked_fields(color, party):
+    '''
+    Возвращает список атакованных полей фигурами цвета *color*
+    '''
+    attacked = []
+    for coords, field in party.fields.items():
+        if color in field.figuretype:
+            x, y = coords
+            attacked = attacked + get_moves(field, party, x, y)
+    return attacked
+
 
