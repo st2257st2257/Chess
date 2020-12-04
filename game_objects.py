@@ -59,7 +59,6 @@ class Field:
                 if field.figuretype == 'black_king':
                     party.bking_pos = field
         party.active_field = None
-        print(party.wking_pos, field.fig)
         return party
 
 
