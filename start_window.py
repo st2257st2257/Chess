@@ -3,7 +3,5 @@ from windows import *
 
 init()
 
-start, username = start_window()
-if start:
-    main_menu(username)
+start_window()
 quit()

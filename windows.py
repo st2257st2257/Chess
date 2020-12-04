@@ -1,6 +1,7 @@
 from visual_module import *
 import pyganim
 import pygame
+from Web import client as cl
 
 field_len = 400
 
@@ -53,15 +54,11 @@ def register_window():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if reg_button.check():
                     error_text = ''
-                    try:
-                        add_player(
-                                username_field.text, 
-                                pass_field.text, email_field.text
-                        )
-                    except Exception:
-                        error_text = 'Unable to create user'
-                    else:
+                    if not cl.check_user(username_field.text):
+                        cl.create_user(username_field.text, pass_field.text)
                         finished = True
+                    else:
+                        error_text = 'User exists'
                 if back_button.check():
                     finished = True
             username_field.event_handler(event)
@@ -120,10 +117,9 @@ def start_window():
                 finished = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check():
-                    id = check_player(username_field.text, pass_field.text)
-                    if id != 0:
-                        start = True
+                    if cl.check_user_lp(username_field.text, pass_field.text):
                         finished = True
+                        start = True
                     else:
                         error_text = 'Wrong password or username'
                 if reg_button.check():
@@ -150,7 +146,8 @@ def start_window():
         clock.tick(FPS)
         pygame.display.update()
         fill()
-    return start, username_field.text
+    if start:
+        main_menu(username_field.text)
 
 
 def main_menu(username):
@@ -171,18 +168,15 @@ def main_menu(username):
                 finished = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if join_game.check():
-                    if check_id(id_field.text):
+                    if cl.check_user_party(id_field.text, 'wait') != 0:
                         id = id_field.text
-                        party = get_party(id)
-                        party.user2 = username
-                        push_party(party, id)
-                        game(id, username)
+                        print('ure wonderful')
+                        #OK HERE MUST BE SMTH
                     else:
                         error_text = 'Unable to find game'
                 if create_game.check():
-                    id = create_new_party(username)
+                    id = cl.create_party(username, 'wait')
                     waiting_room(id)
-                    game(id, username)
             id_field.event_handler(event)
         create_game.draw()
         join_game.draw()
@@ -209,9 +203,7 @@ def waiting_room(id):
                 finished = True
         raw_time += 1 / FPS
         if raw_time > time + 1:
-            party = get_party(id)
-            user2 = party.user2
-            if user2 != 'wait':
+            if not cl.check_user_party(id, 'wait'):
                 finished = True
         time = int(raw_time)
         write_text('Waiting for another player to join: ' + str(time), (

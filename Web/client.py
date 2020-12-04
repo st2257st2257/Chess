@@ -6,7 +6,7 @@ vis = 1
 
 
 # 1:  add_move(472, "56-58" + ";")
-def add_move(party_id=472, move="56-58" + ";"):
+def add_move(party_id, move):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -19,7 +19,7 @@ def add_move(party_id=472, move="56-58" + ";"):
 
 
 # 2
-def create_party(white='white', black='black', time=5):
+def create_party(white, black, time):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -32,7 +32,7 @@ def create_party(white='white', black='black', time=5):
 
 
 # 3:  get_last_move(id=476)
-def get_last_move(party_id=476):
+def get_last_move(party_id):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -45,7 +45,7 @@ def get_last_move(party_id=476):
 
 
 # 4
-def get_party_figures(party_id=472):
+def get_party_figures(party_id):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -58,7 +58,7 @@ def get_party_figures(party_id=472):
 
 
 # 5
-def update_party_figures(party_id=472, figures="11,;21,"):
+def update_party_figures(party_id, figures):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -71,7 +71,7 @@ def update_party_figures(party_id=472, figures="11,;21,"):
 
 
 # 6
-def set_white(party_id, name="white"):
+def set_white(party_id, name):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -84,7 +84,7 @@ def set_white(party_id, name="white"):
 
 
 # 7
-def set_black(party_id, name="black"):
+def set_black(party_id, name):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -123,7 +123,7 @@ def get_black(party_id):
 
 
 # 10
-def check_user(name="ask"):
+def check_user(name):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -136,7 +136,7 @@ def check_user(name="ask"):
 
 
 # 11
-def check_user_party(party_id=472, name="zvzvzs"):
+def check_user_party(party_id, name):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -149,7 +149,7 @@ def check_user_party(party_id=472, name="zvzvzs"):
 
 
 # 12
-def check_user_lp(login='ask', password='srt'):
+def check_user_lp(login, password):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -162,7 +162,7 @@ def check_user_lp(login='ask', password='srt'):
 
 
 # 13
-def check_flag(party_id=472, name="white"):
+def check_flag(party_id, name):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -175,7 +175,7 @@ def check_flag(party_id=472, name="white"):
 
 
 # 14
-def create_user(login="New_user", password="New_password"):
+def create_user(login, password):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -188,7 +188,7 @@ def create_user(login="New_user", password="New_password"):
 
 
 # 15
-def execute_sql(string="SQL", password="password"):
+def execute_sql(string, password):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -201,7 +201,7 @@ def execute_sql(string="SQL", password="password"):
 
 
 # 16
-def get_moves(party_id=472):
+def get_moves(party_id):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -214,7 +214,7 @@ def get_moves(party_id=472):
 
 
 # 17
-def get_last_move_number(party_id=472):
+def get_last_move_number(party_id):
     global vis
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect(('46.138.245.249', 11111))
@@ -235,4 +235,3 @@ def get_last_move_number(party_id=472):
 # create_party("asdf", "DFds", 5)
 # add_move(472, "76-58" + ";")
 
-get_last_move()

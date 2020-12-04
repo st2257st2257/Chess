@@ -5,9 +5,9 @@ from rules import *
 
 FPS = 30
 
-window_width = 1000
+window_width = 1600
 
-window_height = 600
+window_height = 900
 
 field_size = window_height / 8
 
