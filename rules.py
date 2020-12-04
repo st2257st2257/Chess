@@ -14,74 +14,36 @@ def get_moves(field, party, x, y):
     Не учитывает, ограничения, накладываемые на 
     '''
     def get_diag_moves(field, party, x, y):
+        '''
+        Возвращает список доступных диагональных ходов
+        '''
         diag_moves = []
-        for i in range(1,9):
-            if (check(x+i, y+i) and 
-                    party.fields[(x+i, y+i)].figuretype[0] != case[0]):
-                diag_moves.append(party.fields[(x+i, y+i)])
-                if party.fields[(x+i, y+i)].figuretype != 'empty':
-                    break
-            else: 
-                break
-        for i in range(1,9):
-            if (check(x-i, y-i) and 
-                    party.fields[(x-i, y-i)].figuretype[0] != case[0]):
-                diag_moves.append(party.fields[(x-i, y-i)])
-                if party.fields[(x-i, y-i)].figuretype != 'empty':
-                    break
-            else: 
-                break
-        for i in range(1,9):
-            if (check(x-i, y+i) and 
-                    party.fields[(x-i, y+i)].figuretype[0] != case[0]):
-                diag_moves.append(party.fields[(x-i, y+i)])
-                if party.fields[(x-i, y+i)].figuretype != 'empty':
-                    break
-            else: 
-                break
-        for i in range(1,9):
-            if (check(x+i, y-i) and 
-                    party.fields[(x+i, y-i)].figuretype[0] != case[0]):
-                diag_moves.append(party.fields[(x+i, y-i)])
-                if party.fields[(x+i, y-i)].figuretype != 'empty':
-                    break
-            else: 
-                break 
+        for j in [-1, 1]:
+            for k in [-1, 1]:
+                for i in range(1,9):
+                    if (check(x+i*j, y+i*k) and 
+                            party.fields[(x+i*j, y+i*k)].figuretype[0] != case[0]):
+                        diag_moves.append(party.fields[(x+i*j, y+i*k)])
+                        if party.fields[(x+i*j, y+i*k)].figuretype != 'empty':
+                            break
+                    else: 
+                        break
         return diag_moves
+
     def get_dir_moves(field, party, x, y):
+        '''
+        Возвращает список доступных продольных ходов
+        '''
         dir_moves = []
-        for i in range(1,9):
-            if (check(x+i, y) and 
-                    party.fields[(x+i, y)].figuretype[0] != case[0]):
-                dir_moves.append(party.fields[(x+i, y)])
-                if party.fields[(x+i, y)].figuretype != 'empty':
+        for j, k in zip([-1, 1, 0, 0],[0, 0, -1, 1]):
+            for i in range(1,9):
+                if (check(x+i*j, y+i*k) and 
+                        party.fields[(x+i*j, y+i*k)].figuretype[0] != case[0]):
+                    dir_moves.append(party.fields[(x+i*j, y+i*k)])
+                    if party.fields[(x+i*j, y+i*k)].figuretype != 'empty':
+                        break
+                else: 
                     break
-            else: 
-                break
-        for i in range(1,9):
-            if (check(x-i, y) and 
-                    party.fields[(x-i, y)].figuretype[0] != case[0]):
-                dir_moves.append(party.fields[(x-i, y)])
-                if party.fields[(x-i, y)].figuretype != 'empty':
-                    break
-            else: 
-                break
-        for i in range(1,9):
-            if (check(x, y+i) and 
-                    party.fields[(x, y+i)].figuretype[0] != case[0]):
-                dir_moves.append(party.fields[(x, y+i)])
-                if party.fields[(x, y+i)].figuretype != 'empty':
-                    break
-            else: 
-                break
-        for i in range(1,9):
-            if (check(x, y-i) and 
-                    party.fields[(x, y-i)].figuretype[0] != case[0]):
-                dir_moves.append(party.fields[(x, y-i)])
-                if party.fields[(x, y-i)].figuretype != 'empty':
-                    break
-            else: 
-                break 
         return dir_moves
 
     possible_moves = []
@@ -128,3 +90,4 @@ def get_moves(field, party, x, y):
     if 'queen' in case:
         possible_moves = get_diag_moves(field, party, x, y) + get_dir_moves(field, party, x, y)
     return possible_moves
+
