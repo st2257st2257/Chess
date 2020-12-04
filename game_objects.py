@@ -4,14 +4,13 @@ import yaml
 # Чтение .yaml файлов со словарями 
 with open('init_party.yaml', 'r') as file: 
     init_party_dict = yaml.load(file, Loader=yaml.Loader)
-with open('chess_figs.yaml', 'r') as file:
-    chess_dict = yaml.load(file, Loader=yaml.Loader)
-#print(chess_dict)
+
 desk_list = [] 
 for i in range(1,9):
     for j in range(1,9):
         desk_list.append([i,j])
 
+char_dict = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h'}
 
 class Move:
     """docstring for Move"""
@@ -38,19 +37,8 @@ class Field:
     '''
     def __init__(self, figuretype):
         self.figuretype = figuretype
+        self.figmoved = False
         self.lighten = False
-
-    def get_possible_moves(self, party, x, y): # TODO: Для правил нужен отдельный модуль, слишком много проверок
-        '''
-        Возвращает возможные поля для хода для фигуры
-        '''
-        possible_moves = []
-        for move in chess_dict[self.figuretype][1]:
-            move = [x + move[0], y + move[1]]
-            if move in desk_list:
-                possible_moves.append(party.fields[tuple(move)])
-        return possible_moves
-
 
     def move(self, party):
         '''
@@ -63,6 +51,7 @@ class Field:
                 field.figuretype = 'empty'
             if field == self:
                 field.figuretype = attack_figuretype
+                field.figmoved = True
         party.active_field = None
         return party
 
