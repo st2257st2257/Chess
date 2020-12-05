@@ -27,6 +27,7 @@ load_anim = pyganim.PygAnimation(load_anim)
 
 def register_window():
     '''
+    Draws window for creating new user.
     '''
     field_x = (window_width - field_len) // 2
     field_y = window_height // 2 - 100
@@ -153,6 +154,10 @@ def start_window():
 
 
 def main_menu(username):
+    '''
+    Draws main menu for creating or entering game. Takes 
+    *username* - username of user entering main menu.
+    '''
     x = window_width // 5
     y = window_height // 5
     text_font = pygame.font.SysFont('Arial', 40)
@@ -179,6 +184,8 @@ def main_menu(username):
                         else:
                             cl.set_black(id, cl.get_white(id))
                             cl.set_white(id, username)
+                        cl.add_move(id, '')
+                        cl.add_move(id, '')
                         game(id, username)
                     else:
                         error_text = 'Unable to find game'
@@ -198,6 +205,10 @@ def main_menu(username):
 
 
 def waiting_room(id, username):
+    '''
+    Draws waiting room with *id* number. *Username* - username of
+    user creating game with id number.
+    '''
     finished = False
     header_font = pygame.font.SysFont('Arial', 80)
     text_font = pygame.font.SysFont('Arial', 40)
@@ -205,6 +216,7 @@ def waiting_room(id, username):
     screen = get_screen()
     raw_time = 0
     time = 0
+    start = False
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -213,6 +225,7 @@ def waiting_room(id, username):
         if raw_time > time + 1:
             if not cl.check_user_party(id, 'wait'):
                 finished = True
+                start = True
         time = int(raw_time)
         write_text('Waiting for another player to join: ' + str(time), (
             window_width // 2 - 320, window_height // 5), screen, header_font)
@@ -223,5 +236,6 @@ def waiting_room(id, username):
         pygame.display.update()
         fill()
     load_anim.stop()
-    game(id, username)
+    if start:
+        game(id, username)
 

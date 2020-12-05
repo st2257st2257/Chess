@@ -8,6 +8,10 @@ from game_objects import *
 FPS = 30
 
 def figures_to_string(cf_dict):
+    '''
+    Transforms *cf_dict* into database format. *cf_dict* - dictionary
+    of fields in party (party.fields attribute).
+    '''
     output = ''
     for number in cf_dict.keys():
         x, y = number
@@ -17,6 +21,11 @@ def figures_to_string(cf_dict):
 
 
 def string_to_figures(string, cf_dict):
+    '''
+    Transforms string in database into dictionary of fields in party.
+    Takes *string* and *cf_dict* - dictionary of fields on computer to
+    keep *figmoved* attribute on computer.
+    '''
     figs = string.split(';')
     output = {}
     for fig in figs:
@@ -29,6 +38,9 @@ def string_to_figures(string, cf_dict):
 
 
 def game(id, username):
+    '''
+    Game itself with *id* id and *username* - username of user entering game.
+    '''
     party = Party()
     finished = False
     if cl.get_white(id) == username:

@@ -148,7 +148,8 @@ def draw_party(party):
 
 def draw_party_1(party, color):
     '''
-    Прорисовка всех составляющих игры *party*.
+    Draws *party* - element of party class taking *color* - color 
+    of player as argument. Mirrors desk for black player.
     '''
     fill()
     for field_num in party.fields.keys():
@@ -202,8 +203,10 @@ def event_handler(party, prior_flag):
 
 def event_handler_1(party, color):
     '''
-    Обработчик событий. *party* --- игра. prior_flag --- флаг очередности.
-    Возвращает (игру после изменений, флаг очередности, флаг цикличности)
+    Temporary event handler for multiplayer for one move
+    . Takes *party* - element of Party class. *color* - 
+    color of player. Returns party after move, program finish
+    flag and move in format of string.
     '''
     finished = False
     finished_program = False
@@ -220,7 +223,6 @@ def event_handler_1(party, color):
                         y = 9 - y
                     if field_mouse_check(field, x, y) and (
                         color in field.figuretype):
-                        print('1')
                         if color == 'black':
                             y = 9 - y
                         steps = get_moves(field, party, x, y)
