@@ -1,7 +1,9 @@
 from visual_module import *
 import pyganim
 import pygame
+from game import *
 from Web import client as cl
+import random
 
 field_len = 400
 
@@ -171,12 +173,18 @@ def main_menu(username):
                     if cl.check_user_party(id_field.text, 'wait') != 0:
                         id = id_field.text
                         print('ure wonderful')
-                        #OK HERE MUST BE SMTH
+                        colors_gen = random.randint(0, 1)
+                        if colors_gen:
+                            cl.set_black(id, username)
+                        else:
+                            cl.set_black(id, cl.get_white(id))
+                            cl.set_white(id, username)
+                        game(id, username)
                     else:
                         error_text = 'Unable to find game'
                 if create_game.check():
                     id = cl.create_party(username, 'wait', 0)
-                    waiting_room(id)
+                    waiting_room(id, username)
             id_field.event_handler(event)
         create_game.draw()
         join_game.draw()
@@ -189,7 +197,7 @@ def main_menu(username):
         fill()
 
 
-def waiting_room(id):
+def waiting_room(id, username):
     finished = False
     header_font = pygame.font.SysFont('Arial', 80)
     text_font = pygame.font.SysFont('Arial', 40)
@@ -215,4 +223,5 @@ def waiting_room(id):
         pygame.display.update()
         fill()
     load_anim.stop()
+    game(id, username)
 

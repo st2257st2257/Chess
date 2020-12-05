@@ -146,6 +146,23 @@ def draw_party(party):
     clock.tick(FPS)
 
 
+def draw_party_1(party, color):
+    '''
+    Прорисовка всех составляющих игры *party*.
+    '''
+    fill()
+    for field_num in party.fields.keys():
+        field = party.fields[field_num]
+        x, y = field_num
+        if color == 'black':
+            y = 9 - y
+        draw_field(field, x, y)
+    #show_moves(moves)
+    pygame.display.update()
+    clock.tick(FPS)
+
+
+
 def change_flag(prior_flag):
     '''
     Смена флага очередности.
@@ -181,7 +198,49 @@ def event_handler(party, prior_flag):
                     party = field.move(party)
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
-                    
+
+
+def event_handler_1(party, color):
+    '''
+    Обработчик событий. *party* --- игра. prior_flag --- флаг очередности.
+    Возвращает (игру после изменений, флаг очередности, флаг цикличности)
+    '''
+    finished = False
+    finished_program = False
+    while not finished:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+                finished_program = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for field_num in party.fields.keys():
+                    field = party.fields[field_num]
+                    x, y = field_num
+                    if color == 'black':
+                        y = 9 - y
+                    if field_mouse_check(field, x, y) and (
+                        color in field.figuretype):
+                        print('1')
+                        if color == 'black':
+                            y = 9 - y
+                        steps = get_moves(field, party, x, y)
+                        for field_ in party.fields.values():
+                            field_.lighten = False
+                            if field_ in steps:
+                                field_.lighten = True
+                        party.active_field = field
+                    elif field_mouse_check(field, x, y) and field.lighten:
+                        for i in party.fields.keys():
+                            if party.active_field == party.fields[i]:
+                                coords_1 = str(i[0]) + str(i[1])
+                        coords_2 = str(field_num[0]) + str(field_num[1])
+                        party = field.move(party)
+                        move = coords_1 + coords_2
+                        finished = True
+        draw_party_1(party, color)
+    return party, finished_program, move
+   
+
 class InputBox:
     '''
     Box for inputting text. 

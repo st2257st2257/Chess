@@ -2,73 +2,57 @@ from visual_module import *
 import random
 import time
 import pygame
+from Web import client as cl
+from game_objects import *
 
 FPS = 30
 
+def figures_to_string(cf_dict):
+    output = ''
+    for number in cf_dict.keys():
+        x, y = number
+        field = cf_dict[number]
+        output += str(x) + str(y) + ',' + field.figuretype + ';'
+    return output[:-1]
+
+
+def string_to_figures(string, cf_dict):
+    figs = string.split(';')
+    output = {}
+    for fig in figs:
+        data = fig.split(',')
+        coords = (int(data[0][0]), int(data[0][1]))
+        field = Field(data[1])
+        field.figmoved = cf_dict[coords].figmoved
+        output.update({coords:field})
+    return output
+
+
 def game(id, username):
-    party = get_party(id)
-    if username = party.user1:
-        user1_game(id)
-    else:
-        user2_game(id)
-
-def user1_game(id):
-    party = get_party(id)
-    if random.random():
-        party.user1_color = 'black'
-        party.user2_color = 'white'
-    else:
-        party.user1_color = 'white'
-        party.user2_color = 'black'
-    push_party(party)
+    party = Party()
     finished = False
-    frame_iterator = 0
+    if cl.get_white(id) == username:
+        color = 'white'
+    else:
+        color = 'black'
     while not finished:
-        frame_iterator += 1
-        if frame_iterator >= FPS:
-           frame_iterator = 0
-           party = get_party(id)
-        if party.user1_color == party.priority_flag:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    party.winner = party.user2_color
-                    push_party(party, id)
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    party = event_handler(party)
-                    push_party(party, id)
+        if cl.check_flag(id, username):
+            party, finished, move = event_handler_1(party, color)
+            cl.update_party_figures(id, figures_to_string(party.fields))
+            cl.add_move(id, move)
         else:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    finished = True
-                    party.winner = party.user2_color
-                    push_party(party)
-        draw_party_user_1(party, id)
-        if party.winner != '':
-            finished = True
-
-
-def user2_game(id):
-    party = get_party(id)
-    finished = False
-    frame_iterator = 0
-    while not finished:
-        frame_iterator += 1
-        if frame_iterator >= FPS:
-           frame_iterator = 0
-           party = get_party(id)
-        if party.user2_color == party.priority_flag:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    party.winner = party.user1_color
-                    push_party(party, id)
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    party = event_handler(party)
-                    push_party(party, id)
-        else:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    party.winner = party.user2_color
-                    push_party(party, id)
-        draw_party_user_2(party)
-        if party.winner != '':
-            finished = True
+            finished_1 = False
+            frame_counter = 0
+            while not finished_1:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        finished_1 = True
+                        finished = True
+                draw_party_1(party, color)
+                frame_counter += 1
+                if frame_counter >= FPS:
+                    frame_counter = 0
+                    finished_1 = cl.check_flag(id, username)
+                    if finished_1:
+                        party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
+                
