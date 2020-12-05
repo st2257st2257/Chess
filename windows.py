@@ -106,7 +106,7 @@ def start_window():
             field_x, window_height * 4 // 5, 'Play', button_font, BUTTON_COLOR)
     reg_button = button(
             window_width // 2, window_height * 4 // 5, 
-            'Register', button_font, BUTTON_COLOR
+            'sign up', button_font, BUTTON_COLOR
     )
     text_font = pygame.font.SysFont('Arial', 40)
     start = False
@@ -175,7 +175,7 @@ def main_menu(username):
                     else:
                         error_text = 'Unable to find game'
                 if create_game.check():
-                    id = cl.create_party(username, 'wait')
+                    id = cl.create_party(username, 'wait', 0)
                     waiting_room(id)
             id_field.event_handler(event)
         create_game.draw()
