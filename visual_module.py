@@ -21,6 +21,30 @@ COLOR_INACTIVE = (0, 0, 255)
 
 clock = pygame.time.Clock()
 
+back_image = pygame.image.load('interface/background.png')
+back_image = back_image.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+background = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
+pygame.transform.smoothscale(
+        back_image, (window_width, window_height), background)
+
+button_img = pygame.image.load('interface/Button.png')
+button_img = button_img.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+
+button_pushed_img = pygame.image.load('interface/Button_pushed.png')
+button_pushed_img = button_pushed_img.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+
+field_img = pygame.image.load('interface/field.png')
+field_img = field_img.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+
+field_active_img = pygame.image.load('interface/field_active.png')
+field_img = field_active_img.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+
+
 with open('chess_figs.yaml', 'r') as file:
     fig_images = yaml.load(file, Loader=yaml.Loader)
     
@@ -63,7 +87,8 @@ def fill():
     Заливает главный экран белым цветом
     '''
     screen = get_screen()
-    screen.fill(white)
+    screen.fill((255, 255, 255))
+    screen.blit(background, (0, 0))
 
 
 def quit():
@@ -268,10 +293,6 @@ class InputBox:
                 self.active = not self.active
             else:
                 self.active = False
-            if self.active:
-                self.color = COLOR_ACTIVE
-            else:
-                self.color = COLOR_INACTIVE
         elif event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_BACKSPACE:
@@ -285,9 +306,17 @@ class InputBox:
         '''
         x, y = write_text(
                 self.text, (self.x, self.y), self.screen, self.font)
+        width = max(x + 10, self.length)
         self.rect = pygame.Rect(
-                self.x - 5, self.y - 5, max(x + 10, self.length), y + 10)
-        pygame.draw.rect(self.screen, self.color, self.rect, 5)
+                self.x - 5, self.y - 5, width, y + 10)
+        field_image = pygame.Surface((width, y + 10), pygame.SRCALPHA)
+        if self.active:
+            pygame.transform.smoothscale(field_active_img, (width, y + 10), field_image)
+        else:
+            pygame.transform.smoothscale(field_img, (width, y + 10), field_image)
+        self.screen.blit(field_image, (self.x - 5, self.y - 5))
+        write_text(self.text, (self.x, self.y), self.screen, self.font)
+        
 
 
 class button:
@@ -314,8 +343,13 @@ class button:
         '''
         x, y = write_text(self.text, (self.x, self.y), get_screen(), self.font)
         self.rect = pygame.Rect(self.x - 10, self.y - 10, x + 20, y + 20)
-        pygame.draw.rect(get_screen(), self.color, self.rect, 5)
+        x += 20
+        y += 20
+        button_image = pygame.Surface((x, y), pygame.SRCALPHA)
         if self.check():
-            pygame.draw.rect(get_screen(), self.color, self.rect)
+            pygame.transform.smoothscale(button_pushed_img, (x, y), button_image)
+        else:
+            pygame.transform.smoothscale(button_img, (x, y), button_image)
+        get_screen().blit(button_image, (self.x - 10, self.y - 10))
         write_text(self.text, (self.x, self.y), get_screen(), self.font)
 

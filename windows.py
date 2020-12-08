@@ -29,11 +29,11 @@ def register_window():
     '''
     Draws window for creating new user.
     '''
-    field_x = (window_width - field_len) // 2
+    field_x = (window_width - field_len) // 3 * 2
     field_y = window_height // 2 - 100
     username_field = InputBox(field_x, field_y, field_len)
     pass_field = InputBox(field_x, field_y + 100, field_len)
-    email_field = InputBox(field_x, field_y + 200, field_len)
+    rep_pass_field = InputBox(field_x, field_y + 200, field_len)
     screen = get_screen()
     finished = False
     header_font = pygame.font.SysFont('Arial', 80)
@@ -43,7 +43,7 @@ def register_window():
             'Add user', button_font, BUTTON_COLOR
     )
     back_button = button(
-            window_width // 2, window_height * 4 // 5, 
+            field_x + field_len // 2, window_height * 4 // 5, 
             'Back', button_font, BUTTON_COLOR
     )
     text_font = pygame.font.SysFont('Arial', 40)
@@ -57,36 +57,37 @@ def register_window():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if reg_button.check():
                     error_text = ''
-                    if not cl.check_user(username_field.text):
+                    if pass_field.text != rep_pass_field.text:
+                        error_text = 'Passwords do not match'
+                    elif cl.check_user(username_field.text):
+                        error_text = 'User exists'
+                    else:
                         cl.create_user(username_field.text, pass_field.text)
                         finished = True
-                    else:
-                        error_text = 'User exists'
                 if back_button.check():
                     finished = True
             username_field.event_handler(event)
             pass_field.event_handler(event)
-            email_field.event_handler(event)
+            rep_pass_field.event_handler(event)
         password = pass_field.text
+        pass_repeat = rep_pass_field.text
         pass_field.text = '*' * len(pass_field.text)
+        rep_pass_field.text = '*' * len(rep_pass_field.text)
         username_field.draw()
         pass_field.draw()
         reg_button.draw()
         back_button.draw()
-        email_field.draw()
+        rep_pass_field.draw()
         pass_field.text = password
+        rep_pass_field.text = pass_repeat
         write_text('Password', (field_x, 
             pass_field.y - 30), screen, text_font)
         write_text('Username', (
             field_x, username_field.y - 30), screen, text_font)
-        write_text('Phystech.Chess', (
-            field_x, window_height // 10), screen, header_font)
-        write_text('Registration', (
-            field_x, window_height // 10 + 50), screen, text_font)
-        write_text('Email', (
-            field_x, email_field.y - 30), screen, text_font)
+        write_text('Repeat password', (
+            field_x, rep_pass_field.y - 30), screen, text_font)
         write_text(error_text, (
-            field_x, email_field.y + 50), screen, text_font)
+            field_x, rep_pass_field.y + 50), screen, text_font)
         clock.tick(FPS)
         pygame.display.update()
         fill()
@@ -97,7 +98,7 @@ def start_window():
     '''
     Creates main window for entering password and username. 
     '''
-    field_x = (window_width - field_len) // 2
+    field_x = (window_width - field_len) // 3 * 2
     field_y = window_height // 2 - 50
     username_field = InputBox(field_x, field_y, field_len)
     pass_field = InputBox(field_x, field_y + 100, field_len)
@@ -108,8 +109,8 @@ def start_window():
     start_button = button(
             field_x, window_height * 4 // 5, 'Play', button_font, BUTTON_COLOR)
     reg_button = button(
-            window_width // 2, window_height * 4 // 5, 
-            'sign up', button_font, BUTTON_COLOR
+            field_x + field_len // 2, window_height * 4 // 5, 
+            'Sign up', button_font, BUTTON_COLOR
     )
     text_font = pygame.font.SysFont('Arial', 40)
     start = False
@@ -142,8 +143,6 @@ def start_window():
             pass_field.y - 30), screen, text_font)
         write_text('Username', (
             field_x, username_field.y - 30), screen, text_font)
-        write_text('Phystech.Chess', (
-            field_x, window_height // 5), screen, header_font)
         write_text(error_text, (
             field_x, pass_field.y + 50), screen, text_font)
         clock.tick(FPS)
