@@ -2,8 +2,9 @@ from visual_module import *
 import pyganim
 import pygame
 from game import *
-from Web import client as cl
+from Web import client_local as cl
 import random
+import _thread
 
 field_len = 400
 
@@ -163,11 +164,11 @@ def main_menu(username):
     button_font = pygame.font.SysFont('Arial', 50)
     header_font = pygame.font.SysFont('Arial', 80)
     screen = get_screen()
-    create_game = button(x, y * 2, 'Create game', button_font, BUTTON_COLOR)
-    join_game = button(x, y * 3, 'Join game', button_font, BUTTON_COLOR)
-    id_field = InputBox(x + 150, y * 3, field_len)
+    create_game = button(x * 3, y * 2, 'Create game', button_font, BUTTON_COLOR)
+    join_game = button(x * 3, y * 3, 'Join game', button_font, BUTTON_COLOR)
+    id_field = InputBox(x * 3 + 150, y * 3, field_len)
     finished = False
-    error_text = 'test'
+    error_text = ''
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -195,19 +196,24 @@ def main_menu(username):
         create_game.draw()
         join_game.draw()
         id_field.draw()
-        write_text(error_text, (x + 150, y * 3 + 35), screen, text_font)
-        write_text('Enter id', (x + 150, y * 3 - 30), screen, text_font)
-        write_text(username, (x * 2, y * 2), screen, header_font)
+        write_text(error_text, (x * 3 + 150, y * 3 + 35), screen, text_font)
+        write_text('Enter id', (x * 3 + 150, y * 3 - 30), screen, text_font)
+        write_text(username, (x * 4, y * 2), screen, header_font)
         clock.tick(FPS)
         pygame.display.update()
         fill()
 
+def check_start(id, a):
+    global start, finished
+    finished = not cl.check_user_party(id, 'wait')
+    start = finished
 
 def waiting_room(id, username):
     '''
     Draws waiting room with *id* number. *Username* - username of
     user creating game with id number.
     '''
+    global start, finished
     finished = False
     header_font = pygame.font.SysFont('Arial', 80)
     text_font = pygame.font.SysFont('Arial', 40)
@@ -222,9 +228,7 @@ def waiting_room(id, username):
                 finished = True
         raw_time += 1 / FPS
         if raw_time > time + 1:
-            if not cl.check_user_party(id, 'wait'):
-                finished = True
-                start = True
+            _thread.start_new_thread(check_start, (id, 0))
         time = int(raw_time)
         write_text('Waiting for another player to join: ' + str(time), (
             window_width // 2 - 320, window_height // 5), screen, header_font)

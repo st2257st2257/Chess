@@ -44,6 +44,14 @@ field_active_img = pygame.image.load('interface/field_active.png')
 field_img = field_active_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
+rect_img = pygame.image.load('interface/rect.png')
+rect_img = rect_img.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+
+rect_active_img = pygame.image.load('interface/rect.png')
+rect_active_img = rect_active_img.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+
 
 with open('chess_figs.yaml', 'r') as file:
     fig_images = yaml.load(file, Loader=yaml.Loader)
@@ -226,7 +234,7 @@ def event_handler(party, prior_flag):
                     return (party, prior_flag, False)
 
 
-def event_handler_1(party, color):
+def event_handler_1(party, color, moves_window):
     '''
     Temporary event handler for multiplayer for one move
     . Takes *party* - element of Party class. *color* - 
@@ -262,9 +270,11 @@ def event_handler_1(party, color):
                                 coords_1 = str(i[0]) + str(i[1])
                         coords_2 = str(field_num[0]) + str(field_num[1])
                         party = field.move(party)
-                        move = coords_1 + coords_2
+                        move = coords_1 + coords_2 + field.figuretype
                         finished = True
+            moves_window.event_handler(event, None)
         draw_party_1(party, color)
+        moves_window.draw()
     return party, finished_program, move
    
 
@@ -353,3 +363,48 @@ class button:
         get_screen().blit(button_image, (self.x - 10, self.y - 10))
         write_text(self.text, (self.x, self.y), get_screen(), self.font)
 
+
+class Scroll_window:
+    '''
+    '''
+    def __init__(self, x, y, data, font, width, height, clickable):
+        self.x = x
+        self.y = y
+        self.data = data
+        self.font = font
+        self.screen = get_screen()
+        self.surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.rect = pygame.Rect(x, y, width, height)
+        self.width = width
+        self.text_y = y
+        self.clickable = clickable
+        self.elems = []
+
+    def event_handler(self, event, fun):
+        if event.type == pygame.MOUSEWHEEL and self.rect.collidepoint(pygame.mouse.get_pos()):
+            self.text_y += event.y
+        if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(pygame.mouse.get_pos()) and self.clickable:
+            for elem in range(len(self.elems)):
+                if self.elems[elem].collidepoint(pygame.mouse.get_pos()):
+                    fun(elem)
+
+    def draw(self):
+        height = 0
+        for element in self.data:
+            textsurface = self.font.render(element, False, (0, 0, 0))
+            x, y = textsurface.get_size()
+            surf = pygame.Surface((x, y), pygame.SRCALPHA)
+            surfscaled = pygame.Surface((x // 2, y // 2), pygame.SRCALPHA)
+            surf.blit(textsurface, (0, 0))
+            pygame.transform.smoothscale(surf, (x // 2, y //2), surfscaled)
+            elem_surf = pygame.Surface((self.width, y), pygame.SRCALPHA)
+            rect = pygame.Rect(self.x, self.y + height, self.width, y)
+            if rect.collidepoint(pygame.mouse.get_pos()) and self.clickable:
+                pygame.transform.smoothscale(rect_active_img, (self.width, y), elem_surf)
+            else:
+                pygame.transform.smoothscale(rect_img, (self.width, y), elem_surf)
+            elem_surf.blit(surfscaled, (0, 0))
+            self.surface.blit(elem_surf, (0, self.text_y + height))
+            self.elems.append(rect)
+            height += y
+        self.screen.blit(self.surface, (self.x, self.y))

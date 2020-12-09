@@ -2,7 +2,7 @@ from visual_module import *
 import random
 import time
 import pygame
-from Web import client as cl
+from Web import client_local as cl
 from game_objects import *
 
 FPS = 30
@@ -43,15 +43,19 @@ def game(id, username):
     '''
     party = Party()
     finished = False
+    moves = []
+    moves_font = pygame.font.SysFont('Arial', 40)
+    moves_vis = Scroll_window(0, 0, moves, moves_font, 300, 500, False)
     if cl.get_white(id) == username:
         color = 'white'
     else:
         color = 'black'
     while not finished:
         if cl.check_flag(id, username):
-            party, finished, move = event_handler_1(party, color)
+            party, finished, move = event_handler_1(party, color, moves_vis)
             cl.update_party_figures(id, figures_to_string(party.fields))
             cl.add_move(id, move)
+            moves.append(move)
         else:
             finished_1 = False
             frame_counter = 0
@@ -60,11 +64,18 @@ def game(id, username):
                     if event.type == pygame.QUIT:
                         finished_1 = True
                         finished = True
+                    moves_vis.event_handler(event, None)
                 draw_party_1(party, color)
+                moves_vis.draw()
                 frame_counter += 1
                 if frame_counter >= FPS:
                     frame_counter = 0
                     finished_1 = cl.check_flag(id, username)
                     if finished_1:
                         party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
-                
+                        moves.append(cl.get_last_move(id))
+                        moves_vis = Scroll_window(0, 0, moves, moves_font, 300, 500, False)
+
+
+def post_game_lobby(id):
+    pass
