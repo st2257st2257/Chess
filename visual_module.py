@@ -1,4 +1,4 @@
-# coding: utf-8
+# coding: utf-8 import pygame
 import pygame
 import yaml 
 from rules import *
@@ -18,6 +18,17 @@ white = (255, 255, 255)
 lighten = (255, 218, 185)
 COLOR_ACTIVE = (0, 0, 0)
 COLOR_INACTIVE = (0, 0, 255)
+
+letters_dict = {'1':'a', '2':'b', '3':'c', '4':'d', '5':'e', '6':'f', '7':'g', '8':'h'}
+
+figs_dict = {
+        'white_king': '\u2654', 'white_queen': '\u2655', 
+        'white_rook':'\u2656', 'white_bishop': '\u2657', 
+        'white_knight':'\u2658', 'white_pawn':'\u2659', 
+        'black_king':'\u265A', 'black_queen':'\u265B', 
+        'black_rook':'\u265C', 'black_bishop':'\u265D', 
+        'black_knight':'\u265E', 'black_pawn':'\u265F'
+}
 
 clock = pygame.time.Clock()
 
@@ -150,19 +161,21 @@ def write_text(text, coords, surface, font):
     return (x // 2, y // 2)
     
     
-def show_moves(moves):
-    '''
-    Отображает массив ходов *moves*.
-    '''
-    a = 0
-    screen = get_screen()
-    size = (int(desk_x_coord), window_height // 2)
-    moves_surface = pygame.Surface(size, pygame.SRCALPHA)
-    for move in moves[::-1]:
-        write_text(move.text, (0, a * 25), moves_surface)
-        a += 1
-    coords = (int(screen_width - desk_x_coord), 0)
-    screen.blit(moves_surface, coords)
+def move_to_string(move, color):
+    fig = move[4:]
+    if color == 'white':
+        if fig == 'empty':
+            output = letters_dict[move[0]] + move[1] + '-' + letters_dict[move[2]] + move[3]
+        else:
+            output = letters_dict[move[0]] + move[1] + '\u00D7' + letters_dict[move[2]] + move[3] + figs_dict[fig]
+    else:
+        num_1 = str(9 - int(move[1]))
+        num_2 = str(9 - int(move[3]))
+        if fig == 'empty':
+            output = letters_dict[move[0]] + num_1 + '-' + letters_dict[move[2]] + num_2
+        else:
+            output = letters_dict[move[0]] + num_1 + '\u00D7' + letters_dict[move[2]] + num_2 + figs_dict[fig]
+    return output
 
 
 def draw_party(party):
@@ -174,12 +187,11 @@ def draw_party(party):
         field = party.fields[field_num]
         x, y = field_num
         draw_field(field, x, y)
-    #show_moves(moves)
     pygame.display.update()
     clock.tick(FPS)
 
 
-def draw_party_1(party, color):
+def draw_party_1(party, color, moves_vis):
     '''
     Draws *party* - element of party class taking *color* - color 
     of player as argument. Mirrors desk for black player.
@@ -191,8 +203,12 @@ def draw_party_1(party, color):
         if color == 'black':
             y = 9 - y
         draw_field(field, x, y)
-    #show_moves(moves)
-    pygame.display.update()
+    moves = moves_vis.data.copy()
+    for move in range(len(moves)):
+        if not 'win' in moves[move]:
+            moves_vis.data[move] = move_to_string(moves[move], color)
+    moves_vis.draw()
+    moves_vis.data = moves
     clock.tick(FPS)
 
 
@@ -233,8 +249,14 @@ def event_handler(party, prior_flag):
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
 
+def change_color(color):
+    if color == 'black':
+        return 'white'
+    else:
+        return 'black'
 
-def event_handler_1(party, color, moves_window):
+
+def event_handler_1(party, color, moves_window, surr_button):
     '''
     Temporary event handler for multiplayer for one move
     . Takes *party* - element of Party class. *color* - 
@@ -248,6 +270,7 @@ def event_handler_1(party, color, moves_window):
             if event.type == pygame.QUIT:
                 finished = True
                 finished_program = True
+                move = change_color(color) + '_win'
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for field_num in party.fields.keys():
                     field = party.fields[field_num]
@@ -269,12 +292,16 @@ def event_handler_1(party, color, moves_window):
                             if party.active_field == party.fields[i]:
                                 coords_1 = str(i[0]) + str(i[1])
                         coords_2 = str(field_num[0]) + str(field_num[1])
-                        party = field.move(party)
                         move = coords_1 + coords_2 + field.figuretype
+                        party = field.move(party)
                         finished = True
+                if surr_button.check():
+                    finished = True
+                    move = change_color(color) + '_win'
             moves_window.event_handler(event, None)
-        draw_party_1(party, color)
-        moves_window.draw()
+        draw_party_1(party, color, moves_window)
+        surr_button.draw()
+        pygame.display.update()
     return party, finished_program, move
    
 
@@ -376,35 +403,41 @@ class Scroll_window:
         self.surface = pygame.Surface((width, height), pygame.SRCALPHA)
         self.rect = pygame.Rect(x, y, width, height)
         self.width = width
-        self.text_y = y
+        self.text_y = 0
         self.clickable = clickable
         self.elems = []
+        self.field_h = 0
+        self.height = height
 
     def event_handler(self, event, fun):
         if event.type == pygame.MOUSEWHEEL and self.rect.collidepoint(pygame.mouse.get_pos()):
-            self.text_y += event.y
+            self.text_y += event.y * 5
+            if self.text_y > 0:
+                self.text_y = 0
+            if self.text_y + self.field_h < self.height:
+                self.text_y -= event.y * 5
         if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(pygame.mouse.get_pos()) and self.clickable:
             for elem in range(len(self.elems)):
                 if self.elems[elem].collidepoint(pygame.mouse.get_pos()):
-                    fun(elem)
+                    return elem
 
     def draw(self):
         height = 0
+        self.surface.fill((255, 255, 255, 0))
+        self.elems = []
         for element in self.data:
-            textsurface = self.font.render(element, False, (0, 0, 0))
-            x, y = textsurface.get_size()
-            surf = pygame.Surface((x, y), pygame.SRCALPHA)
-            surfscaled = pygame.Surface((x // 2, y // 2), pygame.SRCALPHA)
-            surf.blit(textsurface, (0, 0))
-            pygame.transform.smoothscale(surf, (x // 2, y //2), surfscaled)
+            x, y = write_text(element, (0, self.text_y + height + 5), self.surface, self.font)
+            y += 10
             elem_surf = pygame.Surface((self.width, y), pygame.SRCALPHA)
-            rect = pygame.Rect(self.x, self.y + height, self.width, y)
+            rect = pygame.Rect(self.x, self.y + height + self.text_y, self.width, y)
             if rect.collidepoint(pygame.mouse.get_pos()) and self.clickable:
-                pygame.transform.smoothscale(rect_active_img, (self.width, y), elem_surf)
+                pygame.transform.smoothscale(field_img, (self.width, y), elem_surf)
             else:
                 pygame.transform.smoothscale(rect_img, (self.width, y), elem_surf)
-            elem_surf.blit(surfscaled, (0, 0))
             self.surface.blit(elem_surf, (0, self.text_y + height))
             self.elems.append(rect)
+            write_text(element, (0, self.text_y + height + 5), self.surface, self.font)
             height += y
+        self.field_h = height
         self.screen.blit(self.surface, (self.x, self.y))
+

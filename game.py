@@ -2,7 +2,7 @@ from visual_module import *
 import random
 import time
 import pygame
-from Web import client_local as cl
+from Web import client as cl
 from game_objects import *
 
 FPS = 30
@@ -36,6 +36,12 @@ def string_to_figures(string, cf_dict):
         output.update({coords:field})
     return output
 
+def change_color(color):
+    if color == 'black':
+        return 'white'
+    else:
+        return 'black'
+
 
 def game(id, username):
     '''
@@ -43,19 +49,22 @@ def game(id, username):
     '''
     party = Party()
     finished = False
-    moves = []
-    moves_font = pygame.font.SysFont('Arial', 40)
-    moves_vis = Scroll_window(0, 0, moves, moves_font, 300, 500, False)
+    moves_font = pygame.font.SysFont('FreeSerif', 80)
+    button_font = pygame.font.SysFont('Arial', 80)
+    moves_vis = Scroll_window(0, 0, [], moves_font, 300, 500, False)
+    surrender_button = button(000, 700, 'Surrender', button_font, 0)
     if cl.get_white(id) == username:
         color = 'white'
     else:
         color = 'black'
     while not finished:
         if cl.check_flag(id, username):
-            party, finished, move = event_handler_1(party, color, moves_vis)
+            party, finished, move = event_handler_1(party, color, moves_vis, surrender_button)
+            if 'win' in cl.get_last_move(id):
+                break
             cl.update_party_figures(id, figures_to_string(party.fields))
             cl.add_move(id, move)
-            moves.append(move)
+            moves_vis.data.append(move)
         else:
             finished_1 = False
             frame_counter = 0
@@ -64,18 +73,49 @@ def game(id, username):
                     if event.type == pygame.QUIT:
                         finished_1 = True
                         finished = True
+                        cl.add_move(id, change_color(color) + '_win')
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        if surrender_button.check():
+                            cl.add_move(id, change_color(color) + '_win')
                     moves_vis.event_handler(event, None)
-                draw_party_1(party, color)
-                moves_vis.draw()
+                draw_party_1(party, color, moves_vis)
+                surrender_button.draw()
+                pygame.display.update()
                 frame_counter += 1
                 if frame_counter >= FPS:
                     frame_counter = 0
                     finished_1 = cl.check_flag(id, username)
+                    if 'win' in cl.get_last_move(id):
+                        finished_1 = True
+                        finished = True
                     if finished_1:
                         party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
-                        moves.append(cl.get_last_move(id))
-                        moves_vis = Scroll_window(0, 0, moves, moves_font, 300, 500, False)
+                        moves_vis.data.append(cl.get_last_move(id))
+    post_game_lobby(id, color, party)
 
 
-def post_game_lobby(id):
-    pass
+def post_game_lobby(id, color, party):
+    moves = cl.get_moves(id).split('\', \'')
+    moves.remove('[\'')
+    moves.remove('')
+    moves.pop()
+    party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
+    moves_font = pygame.font.SysFont('FreeSerif', 80)
+    states = [party.fields]
+    for move in moves[::-1]:
+        fig = move[4:]
+        party.fields[int(move[0]), int(move[1])].figuretype = party.fields[int(move[2]), int(move[3])].figuretype
+        party.fields[int(move[2]), int(move[3])].figuretype = fig
+        states.insert(0, figures_to_string(party.fields))
+    finished = False
+    moves_visual = Scroll_window(0, 0, moves, moves_font, 300, 500, True)
+    while not finished:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+            state_num = moves_visual.event_handler(event, None)
+            if state_num != None:
+                party.fields = string_to_figures(states[state_num], party.fields)
+        draw_party_1(party, color, moves_visual)
+        pygame.display.update()
+

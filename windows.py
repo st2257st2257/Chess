@@ -2,7 +2,7 @@ from visual_module import *
 import pyganim
 import pygame
 from game import *
-from Web import client_local as cl
+from Web import client as cl
 import random
 import _thread
 
