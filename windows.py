@@ -10,10 +10,6 @@ field_len = 400
 
 FPS = 30
 
-window_width = 1600
-
-window_height = 900
-
 clock = pygame.time.Clock()
 
 BUTTON_COLOR = (255, 99, 0)
