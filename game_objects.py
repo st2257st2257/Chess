@@ -41,39 +41,26 @@ class Field:
         self.figmoved = False # Флаг, что в поле фигура, делавшая ход
         self.lighten = False # Флаг, что поле подсвечено для хода какой-либо фигуры
 
-    def move(self, party):
+    def move(self, party, field):
         '''
-        Перемещает фигуру из поля в поле *acitive*, 
-        Dозвращает новое состояние *party*
+        Перемещает фигуру из поля *self* в поле *field*
         '''
-        attack_figuretype = party.active_field.figuretype
-        for field in party.fields.values():
-            field.lighten = False
-            if field == party.active_field:
-                field.figuretype = 'empty'
-            if field == self:
-                field.figuretype = attack_figuretype
-                field.figmoved = True
-                if field.figuretype == 'white_king':
-                    party.wking_pos = field
-                if field.figuretype == 'black_king':
-                    party.bking_pos = field
-        party.active_field = None
-        return party
-
+        field.figuretype = self.figuretype
+        field.figmoved = True
+        self.figuretype = 'empty'
 
 class Party:
     """Класс содержит в себе словарь со всеми полями *fields*,
     список со всеми предыдущими ходами *moves*"""
     def __init__(self):
-        self.fields = init_party_dict
+        self.fields = init_party_dict.copy()
         for key in self.fields.keys():
             self.fields.update({key: Field(self.fields[key])})
         self.active_field = None # Поле, по которому нажали для хода
         self.end_flag = False
         self.web_id = 0
         self.moves = []
-        self.wking_pos = get_king_pos('white', self)
-        self.bking_pos = get_king_pos('black', self)
-        self.wattacked = get_attacked_fields('white', self)
-        self.battacked = get_attacked_fields('black', self)
+        self.wking_pos = get_king_pos('white', self.fields)
+        self.bking_pos = get_king_pos('black', self.fields)
+        self.wattacked = get_attacked_fields('white', self.fields)
+        self.battacked = get_attacked_fields('black', self.fields)
