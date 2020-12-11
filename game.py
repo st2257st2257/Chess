@@ -101,7 +101,7 @@ def post_game_lobby(id, color, party):
     moves.pop()
     party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
     moves_font = pygame.font.SysFont('FreeSerif', 80)
-    states = [party.fields]
+    states = [figures_to_string(party.fields)]
     for move in moves[::-1]:
         fig = move[4:]
         party.fields[int(move[0]), int(move[1])].figuretype = party.fields[int(move[2]), int(move[3])].figuretype
@@ -115,7 +115,7 @@ def post_game_lobby(id, color, party):
                 finished = True
             state_num = moves_visual.event_handler(event, None)
             if state_num != None:
-                party.fields = string_to_figures(states[state_num], party.fields)
+                party.fields = string_to_figures(states[state_num + 1], party.fields)
         draw_party_1(party, color, moves_visual)
         pygame.display.update()
 
