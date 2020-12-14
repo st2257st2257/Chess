@@ -7,14 +7,39 @@ import socket
 import sqlite3
 
 
+conn = None
+cursor = None
+vis = 0
+
+
+def init():
+    global vis, conn, cursor
+    conn = sqlite3.connect('example.db')
+    if vis:
+        print("...Start connection...")
+    cursor = conn.cursor()
+
+def cancel():
+    global vis 
+    conn.commit()
+    conn.close()
+    if vis:
+        print("\n...End   connection...")
 
 
 def get_users():
-    return 30
+    global vis, conn, cursor
+    cursor.execute("SELECT * FROM chess_players WHERE id = (SELECT MAX(id) FROM chess_players);");
+    answer = cursor.fetchone()
+    return str(answer[0])
 
 
 def get_games():
-    return 330
+    global vis, conn, cursor
+    cursor.execute("SELECT * FROM chess WHERE id = (SELECT MAX(id) FROM chess);");
+    answer = cursor.fetchone()
+    return str(answer[0])
+
 
 def get_request():
     return 5000 + 500*random.randint(0,10)
@@ -23,14 +48,11 @@ def get_request():
 def get_ping():
     return random.randint(0,10)/5
 
-def get_party():
-    return 40 + random.randint(0,10)
-
 
 def show_diagram(value, name, min_v, max_v, x, y, r, font_size = 12):
     
     new_font = pygame.font.SysFont('arial', font_size)
-    angle = pi*value/(max_v - min_v) 
+    angle = pi*int(value)/(max_v - min_v) 
     pygame.draw.arc(screen, WHITE,[x, y, r*2, r*2], 0, pi, 3)
     pygame.draw.line(screen, GREEN, [x + r, y + r], [x + r - r*numpy.cos(angle),
                                                 y + r - r*numpy.sin(angle)], 5)
@@ -87,7 +109,7 @@ background_image = pygame.image.load("background_4").convert()
 
 angle = pi/4
 while(dead==False):
-    
+    init()
     # getting local IP
     a = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2]
     if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), 
@@ -139,9 +161,9 @@ while(dead==False):
     # boards
     show_diagram(get_request(), "Requests", 0, 100000, 150, 250, 100, 18)
     show_diagram(get_ping(), "Ping", 0, 5, 270, 400, 50, 12)
-    show_diagram(get_party(), "Party", 0, 100, 120, 400, 50, 12)
+    show_diagram(get_games(), "Party", 0, 1000, 120, 400, 50, 12)
     
     
     pygame.display.flip()
     clock.tick(clock_tick_rate)
-    
+    cancel()
