@@ -2,7 +2,7 @@ import socket
 import json
 import sqlite3
 from functions import *
-
+import datetime
 
 init()
 cancel()
@@ -21,7 +21,7 @@ while True:
     client_sock, client_addr = serv_sock.accept()
     if vis:
         print('Connected by', client_addr)
-
+    current_time = datetime.datetime.now()
     while True:
         # Пока клиент не отключился, читаем передаваемые
         # им данные и отправляем их обратно
@@ -103,7 +103,8 @@ while True:
             res = "Error in DB access"
             
         try:
-            print_request(str(client_addr[0]), str(data).split("'"), res) 
+            print_request(str(client_addr[0]), str(data).split("'"), res,
+                          datetime.datetime.now() - current_time) 
         except Exception:
             print("Printing Error")
         
@@ -117,4 +118,3 @@ while True:
             break
 
     client_sock.close()
-
