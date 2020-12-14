@@ -248,6 +248,25 @@ def cancel(vis = 0):
         print("\n...End   connection...")
 
 
+def print_request(client_id="C_I", request="...", answer="..."):
+    global vis, conn, cursor
+    
+    text = ""
+    if (len(request) > 0):
+        text = "REQUEST: [" + str(request[0][1:-3:]) + ", " + str(request[1])  + "]  ANSWER: " + str(answer)
+    else:
+        text = "REQUEST: [" + str(request[0][1:-3:]) + "]  ANSWER: " + str(answer)
+    if vis:
+        print(text)
+    
+    cursor.execute("INSERT INTO History (id, client_id, request, time) VALUES ((SELECT MAX(id) FROM History)+1, '" + str(client_id) + "', '" + text+ "', '" +
+                   str(datetime.datetime.now())
+                   + "');")
+    
+    cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
+    answer = cursor.fetchone()
+    print(answer)
+        
 # init()
 # add_move(472, "56-58" + ";")
 # create_party('white', 'black', 5)
