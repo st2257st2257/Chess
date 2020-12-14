@@ -42,11 +42,20 @@ def get_games():
 
 
 def get_request():
-    return 5000 + 500*random.randint(0,10)
+    global vis, conn, cursor
+    cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
+    answer = cursor.fetchone()
+    return answer[0]
 
 
 def get_ping():
-    return random.randint(0,10)/5
+    global vis, conn, cursor
+    cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
+    answer = cursor.fetchone()
+    if answer[4] == None:
+        return 0
+    else:
+        return answer[4]
 
 
 def show_diagram(value, name, min_v, max_v, x, y, r, font_size = 12):
