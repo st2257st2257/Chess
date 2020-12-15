@@ -32,7 +32,8 @@ def get_attacked_fields(color, party):
 def get_trivial_moves(field, party, x, y):
     '''
     Возвращает список доступных для хода *field* полей из *party.fields*,
-    Не учитывает, ограничения, накладываемые на 
+    не учитывает рокировку и ограничения, связанные с тем, 
+    что союзный король не должен быть атакованным после хода 
     '''
     def get_diag_moves(field, party, x, y):
         '''
@@ -126,6 +127,10 @@ def get_trivial_moves(field, party, x, y):
 
 
 def get_moves(field, party, x, y):
+    '''
+    Возвращает список доступных для хода *field* полей из *party.fields*,
+    учитывает все ограничения используя get_trivial_moves
+    '''
     possible_moves = []
     if field.figuretype == 'empty':
         return possible_moves
@@ -186,7 +191,7 @@ def checkcheck(color, party):
 
 def checkstalemate(color, party):
     '''
-    Возвращает True, если команда цвета *color* в состоянии пата
+    Возвращает True, если команда цвета *color* в не имеет разрешённых ходов
     '''
     moves = []
     for coords, field in party.fields.items():
@@ -196,8 +201,7 @@ def checkstalemate(color, party):
     if not moves:
         return True
     else:
-        return False
-            
+        return False        
 
 
 def checkmate(color, party):
