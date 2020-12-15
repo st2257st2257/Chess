@@ -79,6 +79,10 @@ class Field:
             field.figuretype = self.figuretype
             field.figmoved = True
             self.figuretype = 'empty'
+            if field.figuretype == 'black_pawn' and y == 1:
+                field.figuretype = 'black_queen'
+            if field.figuretype == 'white_pawn' and y == 8:
+                field.figuretype = 'white_queen' 
             move_type = ''
         if (('pawn' in field.figuretype) and 
                 field.long_pawn_move):
