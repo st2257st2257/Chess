@@ -1,12 +1,13 @@
 import sqlite3
 import json
+import datetime
 
 conn = None
 cursor = None
-vis = 1
+vis = 0
 
-def init(vis = 0):
-    global conn, cursor
+def init():
+    global vis, conn, cursor
     conn = sqlite3.connect('example.db')
     if vis:
         print("...Start connection...")
@@ -14,7 +15,7 @@ def init(vis = 0):
 
 
 def add_move(id, move):
-    global conn, cursor
+    global vis, conn, cursor
     if vis:
         print("\nAdding move...")
     
@@ -47,7 +48,7 @@ def add_move(id, move):
         
 
 def create_party(white='white', black='balck', time=5):
-    global conn, cursor
+    global vis, conn, cursor
     if vis:
         print("\nCreating party...")
     
@@ -61,7 +62,7 @@ def create_party(white='white', black='balck', time=5):
  
  
 def get_last_move(id=472):
-    global conn, cursor
+    global vis, conn, cursor
     if vis:
         print("\nGetting last move id=" +str(id)+ "...")
     
@@ -71,7 +72,7 @@ def get_last_move(id=472):
         print("    Last move: ", answer)
     return answer
 
- 
+
 def get_moves(id=472):
     global conn, cursor
     if vis:
@@ -82,125 +83,171 @@ def get_moves(id=472):
     if vis:
         print("    Last move: ", answer)
     return answer
+
+"""
+def get_moves(id):
+    id = int(id)
+    global vis, conn, cursor
+    if vis:
+        print("\nGetting last move id=" +str(id)+ "...")
     
+    cursor.execute("SELECT * FROM chess WHERE id = " + str(id) + ";");
+    answer = str(cursor.fetchone()[2])[:-1].split(';')
+    
+    
+    res =[]
+    for i in answer:
+        if len(i) > 0:
+            res.append(i)
+    
+    if vis:
+        print("    Moves: ", res)
+    return res
+"""
     
 def get_last_move_number(id=472):
     return len(get_moves(id))
 
 
 def get_party_figures(id):
-    global conn, cursor
-    print("\nGetting party figures id=" +str(id)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nGetting party figures id=" +str(id)+ "...")
     
     cursor.execute("SELECT * FROM chess WHERE id = " + str(id) + ";");
     answer = str(cursor.fetchone()[1])
-    print("    Party figures: ", answer)
+    if vis:
+        print("    Party figures: ", answer)
     return answer
 
 
 def update_party_figures(id, party_figures):
-    global conn, cursor
-    print("\nUpdating party figures...")
+    global vis, conn, cursor
+    if vis:
+        print("\nUpdating party figures...")
     
     cursor.execute("UPDATE chess SET party_figures='"+party_figures+"' WHERE id=" + str(id) + ';')
-    print("    End updating")
+    if vis:
+        print("    End updating")
     
     
 def get_white(id):
-    global conn, cursor
-    print("\nGetting white id=" +str(id)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nGetting white id=" +str(id)+ "...")
     
     cursor.execute("SELECT * FROM chess WHERE id = " + str(id) + ";");
     answer = str(cursor.fetchone()[3])
-    print("    Name: ", answer)
+    if vis:
+        print("    Name: ", answer)
     return answer
     
 
 def get_black(id):
-    global conn, cursor
-    print("\nGetting black id=" +str(id)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nGetting black id=" +str(id)+ "...")
     
     cursor.execute("SELECT * FROM chess WHERE id = " + str(id) + ";");
     answer = str(cursor.fetchone()[4])
-    print("    Name: ", answer)
+    if vis:
+        print("    Name: ", answer)
     return answer
 
 
 def set_white(id, name):
-    global conn, cursor
-    print("\nSetting white id=" +str(id)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nSetting white id=" +str(id)+ "...")
     
     cursor.execute("UPDATE chess SET player_white_login='"+name+"' WHERE id=" + str(id) + ';')
-    print("    New white name: ", name)
+    if vis:
+        print("    New white name: ", name)
     
 
 def set_black(id, name):
-    global conn, cursor
-    print("\nSetting black id=" +str(id)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nSetting black id=" +str(id)+ "...")
     
     cursor.execute("UPDATE chess SET player_black_login='"+name+"' WHERE id=" + str(id) + ';')
-    print("    New black name: ", name)
+    if vis:
+        print("    New black name: ", name)
 
 
 def check_user(login):
-    global conn, cursor
-    print("\nChecking user login=" +str(login)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nChecking user login=" +str(login)+ "...")
     
     cursor.execute("SELECT * FROM chess_players WHERE login = '" + str(login) + "';");
     answer = str(cursor.fetchone())
     if answer != "None":
-        print("    Here is a user with login: ", login)
-        print("    User: ", answer)
+        if vis:
+            print("    Here is a user with login: ", login)
+            print("    User: ", answer)
         return 1
     else:
-        print("    Here is no user with that login")
+        if vis:
+            print("    Here is no user with that login")
         return 0
 
 
 def check_user_party(id, login):
-    global conn, cursor
-    print("\nChecking user color in party=" +str(login)+ " login="+str(login)+"...")
+    global vis, conn, cursor
+    if vis:
+        print("\nChecking user color in party=" +str(login)+ " login="+str(login)+"...")
     
     cursor.execute("SELECT * FROM chess WHERE id = " + str(id) + ";");
     answer = cursor.fetchone()
     if str(answer[3]) == login:
-        print("    Here is a white user with login: ", login)
-        print("    User: ", answer[3:])
+        if vis:
+            print("    Here is a white user with login: ", login)
+            print("    User: ", answer[3:])
         return 1
     elif str(answer[4]) == login:
-        print("    Here is black user with that login: ", login)
-        print("    User: ", answer[3:])
+        if vis:
+            print("    Here is black user with that login: ", login)
+            print("    User: ", answer[3:])
         return 2
     else:
-        print("    No users with that login and party name")
-        print("    Answer: ", answer[3:])
+        if vis:
+            print("    No users with that login and party name")
+            print("    Answer: ", answer[3:])
         return 0
 
 
 def check_user_lp(login, password):
-    global conn, cursor
-    print("\nChecking user login=" +str(login)+ "...")
+    global vis, conn, cursor
+    if vis:
+        print("\nChecking user login=" +str(login)+ "...")
     
     cursor.execute("SELECT * FROM chess_players WHERE login = '" + str(login) + "' AND password = '" + str(password) + "';");
     answer = str(cursor.fetchone())
     if answer != "None":
-        print("    Here is a user with login: ", login, " and password: ", password)
-        print("    User: ", answer)
+        if vis:
+            print("    Here is a user with login: ", login, " and password: ", password)
+            print("    User: ", answer)
         return 1
     else:
-        print("    Here is no user with that login")
+        if vis:
+            print("    Here is no user with that login")
         return 0
 
 
 def check_flag(id, login):
-    global conn, cursor
-    print("\nChecking user flag login=" +str(login)+ "...")
+    global vis, conn, cursor
+    if vis: 
+        print("\nChecking user flag login=" +str(login)+ "...")
     
     color = check_user_party(id, login)
     last_move_number = get_last_move_number(id)
     
     if color == 0:
-        print("Error: in getting user color")
+        if vis:
+            print("Error: in getting user color")
+        else:
+            pass
     elif color == 1:
         if last_move_number%2:
             return 0
@@ -215,7 +262,7 @@ def check_flag(id, login):
 
 
 def create_user(login="New_user", password="New_password"):
-    global conn, cursor
+    global vis, conn, cursor
     if vis:
         print("\nCreating user...")
     
@@ -231,42 +278,48 @@ def create_user(login="New_user", password="New_password"):
 
 
 def execute_sql(sql_string, password):
-    global conn, cursor
+    global vis, conn, cursor
     if password == "askristal":
         cursor.execute(sql_string)
         answer = cursor.fetchone()
-        print("    Answer: ", answer)
+        if vis:
+            print("    Answer: ", answer)
         return str(answer[0])
     else:
         return "wrong data"
 
 
-def cancel(vis = 0):
+def cancel():
+    global vis 
     conn.commit()
     conn.close()
     if vis:
         print("\n...End   connection...")
 
 
-def print_request(client_id="C_I", request="...", answer="..."):
+def print_request(client_id="C_I", request="...", answer="...", ping="0"):
     global vis, conn, cursor
     
     text = ""
-    if (len(request) > 0):
-        text = "REQUEST: [" + str(request[0][1:-3:]) + ", " + str(request[1])  + "]  ANSWER: " + str(answer)
-    else:
-        text = "REQUEST: [" + str(request[0][1:-3:]) + "]  ANSWER: " + str(answer)
+    try:
+        if (len(request) > 0):
+            text = "REQUEST: [" + str(request[0][1:-3:]) + ", " + str(request[1])  + "]  ANSWER: " + str(answer)
+        else:
+            text = "REQUEST: [" + str(request[0][1:-3:]) + "]  ANSWER: " + str(answer)
+    except Exception:
+        text = request + ' ' + answer
     if vis:
         print(text)
     
-    cursor.execute("INSERT INTO History (id, client_id, request, time) VALUES ((SELECT MAX(id) FROM History)+1, '" + str(client_id) + "', '" + text+ "', '" +
-                   str(datetime.datetime.now())
+    cursor.execute("INSERT INTO History (id, client_id, request, time, ping) VALUES ((SELECT MAX(id) FROM History)+1, '" + str(client_id) + "', '" + text+ "', '" +
+                   str(datetime.datetime.now()) + "','" + ping
                    + "');")
     
     cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
     answer = cursor.fetchone()
     print(answer)
-        
+    
+    
 # init()
 # add_move(472, "56-58" + ";")
 # create_party('white', 'black', 5)
@@ -283,4 +336,8 @@ def print_request(client_id="C_I", request="...", answer="..."):
 # check_user_lp('ask', 'srt')
 # check_flag(472, "zvzvzs")
 # create_user()
+# print_request()
+# print("ANSWER: ", get_moves(533))
 # cancel()
+
+

@@ -40,14 +40,54 @@ class Field:
         self.figuretype = figuretype
         self.figmoved = False # Флаг, что в поле фигура, делавшая ход
         self.lighten = False # Флаг, что поле подсвечено для хода какой-либо фигуры
+        self.castling = False
+        self.enpassant = False
+        self.long_pawn_move = False # Флаг, что это поле доступно для длинного хода
+        self.pawn_moved = False # Флаг, что на предыдущем ходе в это поле пешка сделала длинный ход
 
-    def move(self, party, field):
+    def move(self, party, field, x, y):
         '''
-        Перемещает фигуру из поля *self* в поле *field*
+        Перемещает фигуру из поля *self* в поле *field*.
+        x, y - координаты *field*
+        Возвращает тип хода: 
+        '', если обычный ход,
+        'castling', если рокировка,
+        'enpassant', если взятие на проходе 
         '''
-        field.figuretype = self.figuretype
-        field.figmoved = True
-        self.figuretype = 'empty'
+        if field.castling:
+            if x == 7:
+                field.figuretype = self.figuretype
+                self.figuretype = 'empty'
+                party.fields[(x-1,y)].figuretype = party.fields[(x+1,y)].figuretype
+                party.fields[(x+1,y)].figuretype = 'empty'
+            if x == 3:
+                field.figuretype = self.figuretype
+                self.figuretype = 'empty'
+                party.fields[(x+1,y)].figuretype = party.fields[(x-2,y)].figuretype
+                party.fields[(x-2,y)].figuretype = 'empty'
+            move_type = 'castling'
+        elif field.enpassant:
+            field.figuretype = self.figuretype
+            field.figmoved = True
+            self.figuretype = 'empty'
+            if field.figuretype == 'white_pawn':
+                party.fields[(x, y-1)].figuretype = 'empty'
+            if field.figuretype == 'black_pawn':
+                party.fields[(x, y+1)].figuretype = 'empty'
+            move_type = 'enpassant'
+        else:
+            field.figuretype = self.figuretype
+            field.figmoved = True
+            self.figuretype = 'empty'
+            move_type = ''
+        if (('pawn' in field.figuretype) and 
+                field.long_pawn_move):
+            field.pawn_moved = True
+            party.last_pawn = field
+        else:
+            for field in party.fields.values():
+                field.pawn_moved = False
+        return move_type
 
 class Party:
     """Класс содержит в себе словарь со всеми полями *fields*,
@@ -60,7 +100,11 @@ class Party:
         self.end_flag = False
         self.web_id = 0
         self.moves = []
-        self.wking_pos = get_king_pos('white', self.fields)
-        self.bking_pos = get_king_pos('black', self.fields)
-        self.wattacked = get_attacked_fields('white', self.fields)
-        self.battacked = get_attacked_fields('black', self.fields)
+        #self.wking_pos = get_king_pos('white', self)
+        #self.bking_pos = get_king_pos('black', self)
+        #self.wattacked = get_attacked_fields('white', self)
+        #self.battacked = get_attacked_fields('black', self)
+        self.last_pawn = None
+
+
+        
