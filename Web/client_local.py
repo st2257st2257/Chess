@@ -7,7 +7,7 @@ current_ip = '127.0.0.1'
 
 # 1:  add_move(472, "56-58" + ";")
 def add_move(party_id, move):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([1, [party_id, move]]).encode())
@@ -20,7 +20,7 @@ def add_move(party_id, move):
 
 # 2
 def create_party(white, black, time):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([2, [white, black, time]]).encode())
@@ -33,7 +33,7 @@ def create_party(white, black, time):
 
 # 3:  get_last_move(id=476)
 def get_last_move(party_id):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([3, [party_id]]).encode())
@@ -46,7 +46,7 @@ def get_last_move(party_id):
 
 # 4
 def get_party_figures(party_id):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([4, [party_id]]).encode())
@@ -59,7 +59,7 @@ def get_party_figures(party_id):
 
 # 5
 def update_party_figures(party_id, figures):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([5, [party_id, figures]]).encode())
@@ -72,7 +72,7 @@ def update_party_figures(party_id, figures):
 
 # 6
 def set_white(party_id, name):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([6, [party_id, name]]).encode())
@@ -85,7 +85,7 @@ def set_white(party_id, name):
 
 # 7
 def set_black(party_id, name):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([7, [party_id, name]]).encode())
@@ -98,7 +98,7 @@ def set_black(party_id, name):
 
 # 8
 def get_white(party_id):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([8, [party_id]]).encode())
@@ -111,7 +111,7 @@ def get_white(party_id):
 
 # 9
 def get_black(party_id):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([9, [party_id]]).encode())
@@ -124,7 +124,7 @@ def get_black(party_id):
 
 # 10
 def check_user(name):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([10, [name]]).encode())
@@ -137,7 +137,7 @@ def check_user(name):
 
 # 11
 def check_user_party(party_id, name):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([11, [party_id, name]]).encode())
@@ -150,7 +150,7 @@ def check_user_party(party_id, name):
 
 # 12
 def check_user_lp(login, password):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([12, [login, password]]).encode())
@@ -163,7 +163,7 @@ def check_user_lp(login, password):
 
 # 13
 def check_flag(party_id, name):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([13, [party_id, name]]).encode())
@@ -176,7 +176,7 @@ def check_flag(party_id, name):
 
 # 14
 def create_user(login, password):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([14, [login, password]]).encode())
@@ -189,7 +189,7 @@ def create_user(login, password):
 
 # 15
 def execute_sql(string, password):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([15, [string, password]]).encode())
@@ -202,7 +202,7 @@ def execute_sql(string, password):
 
 # 16
 def get_moves(party_id):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([16, [party_id]]).encode())
@@ -215,7 +215,7 @@ def get_moves(party_id):
 
 # 17
 def get_last_move_number(party_id):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([17, [party_id]]).encode())
@@ -228,7 +228,7 @@ def get_last_move_number(party_id):
 
 # 18
 def check_rate(login):
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([18, [login]]).encode())
@@ -245,7 +245,7 @@ def update_rate(login_1, login_2, flag):
     # 0 - draw
     # 1 - login_1 won
     # 2 - login_2 won
-    global vis
+    global vis, current_ip
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((current_ip, 11111))
     client_sock.sendall(json.dumps([19, [login_1, login_2, flag]]).encode())
