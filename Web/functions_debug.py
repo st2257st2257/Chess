@@ -261,64 +261,6 @@ def check_flag(id, login):
     return 0
 
 
-def create_user(login="New_user", password="New_password"):
-    global vis, conn, cursor
-    if vis:
-        print("\nCreating user...")
-    
-    
-    cursor.execute("INSERT INTO chess_players (id, login, password, rate) VALUES ((SELECT MAX(id) FROM chess_players)+1, '" +
-                   str(login) + "','" + str(password) + "',800);")
-    
-    cursor.execute("SELECT * FROM chess_players WHERE id = (SELECT MAX(id) FROM chess_players);");
-    answer = cursor.fetchone()
-    if vis:
-        print("    New party: ", answer)
-    return str(answer[0])
-
-
-def execute_sql(sql_string, password):
-    global vis, conn, cursor
-    if password == "askristal":
-        cursor.execute(sql_string)
-        answer = cursor.fetchone()
-        if vis:
-            print("    Answer: ", answer)
-        return str(answer[0])
-    else:
-        return "wrong data"
-
-
-def cancel():
-    global vis 
-    conn.commit()
-    conn.close()
-    if vis:
-        print("\n...End   connection...")
-
-
-def print_request(client_id="C_I", request="...", answer="...", ping="0"):
-    global vis, conn, cursor
-    
-    text = ""
-    try:
-        if (len(request) > 0):
-            text = "REQUEST: [" + str(request[0][1:-3:]) + ", " + str(request[1])  + "]  ANSWER: " + str(answer)
-        else:
-            text = "REQUEST: [" + str(request[0][1:-3:]) + "]  ANSWER: " + str(answer)
-    except Exception:
-        text = request + ' ' + answer
-    if vis:
-        print(text)
-    
-    cursor.execute("INSERT INTO History (id, client_id, request, time, ping) VALUES ((SELECT MAX(id) FROM History)+1, '" + str(client_id) + "', '" + text+ "', '" +
-                   str(datetime.datetime.now()) + "','" + ping
-                   + "');")
-    
-    cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
-    answer = cursor.fetchone()
-    print(answer)
-
 def check_rate(login):
     global vis, conn, cursor
     if vis: 
@@ -326,8 +268,6 @@ def check_rate(login):
     
     cursor.execute("SELECT * FROM chess_players WHERE login = '" + login + "';");
     answer = cursor.fetchone()
-    if vis:
-        print(answer[3])
     return answer[3]
 
 
@@ -370,11 +310,68 @@ def update_rate(login_1, login_2, flag):
     value_1 = user_1[3] + K*((vin_1) - (1/(1+10**((user_2[3] - user_1[3])/400))))
     value_2 = user_2[3] + K*((vin_2) - (1/(1+10**((user_1[3] - user_2[3])/400))))
     
-    if vis:
-        print("New rate: ", value_1, value_2)
+    print(value_1, value_2)
     
     set_rate(login_1, int(value_1)+1)
     set_rate(login_2, int(value_2)+1)
+    
+        
+
+
+def create_user(login="New_user", password="New_password"):
+    global vis, conn, cursor
+    if vis:
+        print("\nCreating user...")
+    
+    
+    cursor.execute("INSERT INTO chess_players (id, login, password, rate) VALUES ((SELECT MAX(id) FROM chess_players)+1, '" +
+                   str(login) + "','" + str(password) + "',800);")
+    
+    cursor.execute("SELECT * FROM chess_players WHERE id = (SELECT MAX(id) FROM chess_players);");
+    answer = cursor.fetchone()
+    if vis:
+        print("    New party: ", answer)
+    return str(answer[0])
+
+
+def execute_sql(sql_string, password):
+    global vis, conn, cursor
+    if password == "askristal":
+        cursor.execute(sql_string)
+        answer = cursor.fetchone()
+        if vis:
+            print("    Answer: ", answer)
+        return str(answer)
+    else:
+        return "wrong data"
+
+
+def cancel():
+    global vis 
+    conn.commit()
+    conn.close()
+    if vis:
+        print("\n...End   connection...")
+
+
+def print_request(client_id="C_I", request="...", answer="..."):
+    global vis, conn, cursor
+    
+    text = ""
+    if (len(request) > 0):
+        text = "REQUEST: [" + str(request[0][1:-3:]) + ", " + str(request[1])  + "]  ANSWER: " + str(answer)
+    else:
+        text = "REQUEST: [" + str(request[0][1:-3:]) + "]  ANSWER: " + str(answer)
+    if vis:
+        print(text)
+    
+    cursor.execute("INSERT INTO History (id, client_id, request, time) VALUES ((SELECT MAX(id) FROM History)+1, '" + str(client_id) + "', '" + text+ "', '" +
+                   str(datetime.datetime.now())
+                   + "');")
+    
+    cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
+    answer = cursor.fetchone()
+    print(answer)
     
 # init()
 # add_move(472, "56-58" + ";")
@@ -391,9 +388,13 @@ def update_rate(login_1, login_2, flag):
 # check_user_party(472, "zvzvzs")
 # check_user_lp('ask', 'srt')
 # check_flag(472, "zvzvzs")
-# create_user()
+# create_user("test", "test")
 # print_request()
 # print("ANSWER: ", get_moves(533))
+# 1: execute_sql("ALTER TABLE History ADD ping VARCHAR(255) NULL;", "askristal")
+# :: execute_sql("ALTER TABLE Chess_players ADD rate int(11) NULL DEFAULT 800;", "askristal")
+# :: execute_sql("ALTER TABLE History DROP COLUMN rate;", "askristal")#
+# set_rate("ask", 1142)
+# update_rate("test", "ask", 0)
+# check_rate("test")
 # cancel()
-
-
