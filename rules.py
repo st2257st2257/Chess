@@ -208,5 +208,5 @@ def checkmate(color, party):
     '''
     Возвращает True, если мат поставлен команде цвета *color*
     '''
-    return checkcheck and checkstalemate
+    return checkcheck(color, party) and checkstalemate(color, party)
 
