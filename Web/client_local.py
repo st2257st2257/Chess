@@ -260,6 +260,7 @@ def get_party_id(login):
     client_sock.sendall(json.dumps([20, [login]]).encode())
     data = json.loads(client_sock.recv(1024))
     client_sock.close()
+    return data
     
 # set_black(472, "abcc")
 # check_user()
