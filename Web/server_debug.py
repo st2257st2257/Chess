@@ -1,7 +1,7 @@
 import socket
 import json
 import sqlite3
-from functions import *
+from functions_debug import *
 import datetime
 
 init()
