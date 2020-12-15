@@ -2,7 +2,7 @@ from visual_module import *
 import random
 import time
 import pygame
-from Web import client as cl
+from Web import client_local as cl
 from game_objects import *
 
 FPS = 30
@@ -49,21 +49,24 @@ def game(id, username):
     '''
     party = Party()
     finished = False
-    moves_font = pygame.font.SysFont('FreeSerif', 80)
-    button_font = pygame.font.SysFont('Arial', 80)
-    moves_vis = Scroll_window(0, 0, [], moves_font, 300, 500, False)
-    surrender_button = button(000, 700, 'Surrender', button_font, 0)
+    moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
+    button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
+    moves_vis = Scroll_window(0, 0, [], moves_font, int(desk_x_coord), int(450 * scale_y), False)
+    surrender_button = button(int(50 * scale_x), int(500 * scale_y), 'Surrender', button_font)
     if cl.get_white(id) == username:
         color = 'white'
     else:
         color = 'black'
     while not finished:
         if cl.check_flag(id, username):
-            party, finished, move = event_handler_1(party, color, moves_vis, surrender_button)
+            party, finished_program, move = event_handler_1(party, color, moves_vis, surrender_button)
             if 'win' in cl.get_last_move(id):
                 break
             cl.update_party_figures(id, figures_to_string(party.fields))
             cl.add_move(id, move)
+            if finished_program:
+                pygame.quit()
+                raise SystemExit
             moves_vis.data.append(move)
         else:
             finished_1 = False
@@ -72,8 +75,9 @@ def game(id, username):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         finished_1 = True
-                        finished = True
                         cl.add_move(id, change_color(color) + '_win')
+                        pygame.quit()
+                        raise SystemExit
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if surrender_button.check():
                             cl.add_move(id, change_color(color) + '_win')
@@ -100,7 +104,9 @@ def post_game_lobby(id, color, party):
     moves.remove('')
     moves.pop()
     party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
-    moves_font = pygame.font.SysFont('FreeSerif', 80)
+    moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
+    button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
+    to_main_button = button(int(10 * scale_x), int(500 * scale_y), 'Back to main menu', button_font)
     states = [figures_to_string(party.fields)]
     for move in moves[::-1]:
         fig = move[4:]
@@ -108,14 +114,19 @@ def post_game_lobby(id, color, party):
         party.fields[int(move[2]), int(move[3])].figuretype = fig
         states.insert(0, figures_to_string(party.fields))
     finished = False
-    moves_visual = Scroll_window(0, 0, moves, moves_font, 300, 500, True)
+    moves_visual = Scroll_window(0, 0, moves, moves_font, int(desk_x_coord), 450 * scale_y, True)
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                finished = True
+                pygame.quit()
+                raise SystemExit
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if to_main_button.check():
+                    finished = True
             state_num = moves_visual.event_handler(event, None)
             if state_num != None:
                 party.fields = string_to_figures(states[state_num + 1], party.fields)
         draw_party_1(party, color, moves_visual)
+        to_main_button.draw()
         pygame.display.update()
 

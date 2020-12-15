@@ -1,14 +1,14 @@
 # Содержит название файлов изображений для каждой фигуры а так же возможные ходы без учёта ограничений партии
-white_king: chess_figures/white_king.png
-white_queen: chess_figures/white_queen.png
-white_rook: chess_figures/white_rook.png
-white_bishop: chess_figures/white_bishop.png
-white_knight: chess_figures/white_knight.png
-white_pawn: chess_figures/white_pawn.png
-black_king: chess_figures/black_king.png
-black_queen: chess_figures/black_queen.png
-black_rook: chess_figures/black_rook.png
-black_bishop: chess_figures/black_bishop.png
-black_knight: chess_figures/black_knight.png
-black_pawn: chess_figures/black_pawn.png
+white_king: /white_king.png
+white_queen: /white_queen.png
+white_rook: /white_rook.png
+white_bishop: /white_bishop.png
+white_knight: /white_knight.png
+white_pawn: /white_pawn.png
+black_king: /black_king.png
+black_queen: /black_queen.png
+black_rook: /black_rook.png
+black_bishop: /black_bishop.png
+black_knight: /black_knight.png
+black_pawn: /black_pawn.png
 

@@ -5,19 +5,24 @@ from rules import *
 
 FPS = 30
 
-window_width = 800
+with open('config.yaml', 'r') as file:
+    config = yaml.load(file, Loader=yaml.Loader)
 
-window_height = 600
+window_width = config['resolution'][0]
+
+window_height = config['resolution'][1]
 
 field_size = window_height / 8
 
 desk_x_coord = (window_width - window_height) / 2 
 
+scale_x = window_width / 1600
+
+scale_y = window_height / 900
+
 black = (0, 0, 0)
 white = (255, 255, 255)
 lighten = (255, 218, 185)
-COLOR_ACTIVE = (0, 0, 0)
-COLOR_INACTIVE = (0, 0, 255)
 
 letters_dict = {'1':'a', '2':'b', '3':'c', '4':'d', '5':'e', '6':'f', '7':'g', '8':'h'}
 
@@ -62,6 +67,14 @@ rect_img = rect_img.convert_alpha(
 rect_active_img = pygame.image.load('interface/rect.png')
 rect_active_img = rect_active_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
+
+login_image = pygame.image.load('background.png')
+login_image = back_image.convert_alpha(
+        pygame.display.set_mode((window_width, window_height)))
+login_pic = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
+pygame.transform.smoothscale(
+        login_image, (window_width, window_height), login_pic)
+
 
 
 with open('chess_figs.yaml', 'r') as file:
@@ -108,6 +121,11 @@ def fill():
     screen = get_screen()
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
+
+
+def login_fill():
+    get_screen().fill((255, 255, 255))
+    get_screen().blit(login_pic, (0, 0))
 
 
 def quit():
@@ -163,18 +181,10 @@ def write_text(text, coords, surface, font):
     
 def move_to_string(move, color):
     fig = move[4:]
-    if color == 'white':
-        if fig == 'empty':
-            output = letters_dict[move[0]] + move[1] + '-' + letters_dict[move[2]] + move[3]
-        else:
-            output = letters_dict[move[0]] + move[1] + '\u00D7' + letters_dict[move[2]] + move[3] + figs_dict[fig]
+    if fig == 'empty':
+        output = letters_dict[move[0]] + move[1] + '-' + letters_dict[move[2]] + move[3]
     else:
-        num_1 = str(9 - int(move[1]))
-        num_2 = str(9 - int(move[3]))
-        if fig == 'empty':
-            output = letters_dict[move[0]] + num_1 + '-' + letters_dict[move[2]] + num_2
-        else:
-            output = letters_dict[move[0]] + num_1 + '\u00D7' + letters_dict[move[2]] + num_2 + figs_dict[fig]
+        output = letters_dict[move[0]] + move[1] + '\u00D7' + letters_dict[move[2]] + move[3] + figs_dict[fig]
     return output
 
 
@@ -191,12 +201,14 @@ def draw_party(party):
     clock.tick(FPS)
 
 
-def draw_party_1(party, color, moves_vis):
+def draw_party_1(party, color, moves_vis, players_data = None):
     '''
     Draws *party* - element of party class taking *color* - color 
     of player as argument. Mirrors desk for black player.
     '''
     fill()
+    font = pygame.font.SysFont('Arial', int(50 * scale_x))
+    font_pl = pygame.font.SysFont('Arial', int(80 * scale_x))
     for field_num in party.fields.keys():
         field = party.fields[field_num]
         x, y = field_num
@@ -209,6 +221,15 @@ def draw_party_1(party, color, moves_vis):
             moves_vis.data[move] = move_to_string(moves[move], color)
     moves_vis.draw()
     moves_vis.data = moves
+    for i in range(8):
+        if color == 'white':
+            write_text(str(8 - i), (desk_x_coord, field_size * i), get_screen(), font)
+        else:
+            write_text(str(i + 1), (desk_x_coord, field_size * i), get_screen(), font)
+        write_text(letters_dict[str(i + 1)], (desk_x_coord + int(field_size * (i + 0.8)), field_size * 7), get_screen(), font)
+    if players_data != None:
+        write_text(players_data['player'] + '/n' + players_data['player_rating'], (desk_x_coord + field_size * 8 + 10, 675 * scale_y), get_screen(), font_pl)
+        write_text(players_data['opponent'] + '/n' + players_data['opponent_rating'], (desk_x_coord + field_size * 8 + 10, 225 * scale_y), get_screen(), font_pl)
     clock.tick(FPS)
 
 
@@ -319,13 +340,12 @@ class InputBox:
     def __init__(self, x, y, length):
         self.x = x
         self.y = y
-        self.color = COLOR_INACTIVE
         self.screen = get_screen()
         self.text = ''
         self.active = False
         self.length = length
         self.rect = pygame.Rect(self.x, self.y, length, 15)
-        self.font = pygame.font.SysFont('Arial', 45)
+        self.font = pygame.font.SysFont('Arial', int(45 * scale_x))
 
     def event_handler(self, event):
         '''
@@ -347,17 +367,19 @@ class InputBox:
         '''
         Function draws the box.
         '''
+        dx = int(5 * scale_x)
+        dy = int(5 * scale_y)
         x, y = write_text(
                 self.text, (self.x, self.y), self.screen, self.font)
-        width = max(x + 10, self.length)
+        width = max(x + 2 * dx, self.length)
         self.rect = pygame.Rect(
-                self.x - 5, self.y - 5, width, y + 10)
-        field_image = pygame.Surface((width, y + 10), pygame.SRCALPHA)
+                self.x - dx, self.y - dx, width, y + 2 * dy)
+        field_image = pygame.Surface((width, y + 2 * dy), pygame.SRCALPHA)
         if self.active:
-            pygame.transform.smoothscale(field_active_img, (width, y + 10), field_image)
+            pygame.transform.smoothscale(field_active_img, (width, y + 2 * dy), field_image)
         else:
-            pygame.transform.smoothscale(field_img, (width, y + 10), field_image)
-        self.screen.blit(field_image, (self.x - 5, self.y - 5))
+            pygame.transform.smoothscale(field_img, (width, y + 2 * dy), field_image)
+        self.screen.blit(field_image, (self.x - dx, self.y - dy))
         write_text(self.text, (self.x, self.y), self.screen, self.font)
         
 
@@ -366,8 +388,7 @@ class button:
     '''
     button with text *text*, coords *x, y*, font *font* and color *color*.
     '''
-    def __init__(self, x, y, text, font, color):
-        self.color = color
+    def __init__(self, x, y, text, font):
         self.font = font
         self.x = x
         self.y = y
@@ -384,16 +405,18 @@ class button:
         '''
         draws button
         '''
+        dx = int(10 * scale_x)
+        dy = int(10 * scale_y)
         x, y = write_text(self.text, (self.x, self.y), get_screen(), self.font)
-        self.rect = pygame.Rect(self.x - 10, self.y - 10, x + 20, y + 20)
-        x += 20
-        y += 20
+        self.rect = pygame.Rect(self.x - dx, self.y - dy, x + 2 * dx, y + 2 * dy)
+        x += 2 * dx
+        y += 2 * dy
         button_image = pygame.Surface((x, y), pygame.SRCALPHA)
         if self.check():
             pygame.transform.smoothscale(button_pushed_img, (x, y), button_image)
         else:
             pygame.transform.smoothscale(button_img, (x, y), button_image)
-        get_screen().blit(button_image, (self.x - 10, self.y - 10))
+        get_screen().blit(button_image, (self.x - dx, self.y - dx))
         write_text(self.text, (self.x, self.y), get_screen(), self.font)
 
 
@@ -417,11 +440,11 @@ class Scroll_window:
 
     def event_handler(self, event, fun):
         if event.type == pygame.MOUSEWHEEL and self.rect.collidepoint(pygame.mouse.get_pos()):
-            self.text_y += event.y * 5
+            self.text_y += event.y * 5 * scale_y
             if self.text_y > 0:
                 self.text_y = 0
             if self.text_y + self.field_h < self.height:
-                self.text_y -= event.y * 5
+                self.text_y -= event.y * 5 * scale_y
         if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(pygame.mouse.get_pos()) and self.clickable:
             for elem in range(len(self.elems)):
                 if self.elems[elem].collidepoint(pygame.mouse.get_pos()):
@@ -432,8 +455,9 @@ class Scroll_window:
         self.surface.fill((255, 255, 255, 0))
         self.elems = []
         for element in self.data:
-            x, y = write_text(element, (0, self.text_y + height + 5), self.surface, self.font)
-            y += 10
+            dy = int(5 * scale_y)
+            x, y = write_text(element, (0, self.text_y + height + dy), self.surface, self.font)
+            y += 2 * dy
             elem_surf = pygame.Surface((self.width, y), pygame.SRCALPHA)
             rect = pygame.Rect(self.x, self.y + height + self.text_y, self.width, y)
             if rect.collidepoint(pygame.mouse.get_pos()) and self.clickable:
@@ -442,7 +466,7 @@ class Scroll_window:
                 pygame.transform.smoothscale(rect_img, (self.width, y), elem_surf)
             self.surface.blit(elem_surf, (0, self.text_y + height))
             self.elems.append(rect)
-            write_text(element, (0, self.text_y + height + 5), self.surface, self.font)
+            write_text(element, (0, self.text_y + height + dy), self.surface, self.font)
             height += y
         self.field_h = height
         self.screen.blit(self.surface, (self.x, self.y))
