@@ -110,6 +110,21 @@ def post_game_lobby(id, color, party):
     states = [figures_to_string(party.fields)]
     for move in moves[::-1]:
         fig = move[4:]
+        if 'enpassant' in move:
+            fig = 'empty'
+            if int(move[3]) > int(move[1]):
+                fig_killed = 'black'
+            else:
+                fig_killed = 'white'
+            party.fields[int(move[0]), int(move[3])].figuretype = fig_killed
+        if 'O-O' in move:
+            if move[2] == '7':
+                party.fields[8, int(move[1])].figuretype = party.fields[6, int(move[1])].figuretype
+                party.fields[6, int(move[1])].figuretype = 'empty'
+            else:
+                party.fields[1, int(move[1])].figuretype = party.fields[4, int(move[1])].figuretype
+                party.fields[4, int(move[1])].figuretype = 'empty'
+            fig = 'empty'
         party.fields[int(move[0]), int(move[1])].figuretype = party.fields[int(move[2]), int(move[3])].figuretype
         party.fields[int(move[2]), int(move[3])].figuretype = fig
         states.insert(0, figures_to_string(party.fields))

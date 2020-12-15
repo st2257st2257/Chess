@@ -8,6 +8,12 @@ FPS = 30
 with open('config.yaml', 'r') as file:
     config = yaml.load(file, Loader=yaml.Loader)
 
+fig_style = 'fig_styles/' + config['figs'] + '/'
+
+desk_style = 'desk_styles/' + config['desk'] + '/'
+
+theme = 'themes/' + config['theme'] + '/'
+
 window_width = config['resolution'][0]
 
 window_height = config['resolution'][1]
@@ -95,7 +101,7 @@ def set_image(file):
 
 
 for figure in fig_images.keys():
-    fig_images.update({figure : set_image(fig_images[figure])})
+    fig_images.update({figure : set_image(fig_style + fig_images[figure])})
 fig_images.update({'empty' : pygame.Surface((0, 0))})
 
 
@@ -181,6 +187,25 @@ def write_text(text, coords, surface, font):
     
 def move_to_string(move, color):
     fig = move[4:]
+    if 'O-O' in move:
+        if move[1] == '1':
+            if move[2] == '7':
+                output = 'O-O' + figs_dict['white_king']
+            else:
+                output = 'O-O-O' + figs_dict['white_king']
+        else:
+            if move[2] == '7':
+                output = 'O-O' + figs_dict['black_king']
+            else:
+                output = 'O-O-O' + figs_dict['black_king']
+        return output
+    if 'enpassant' in move:
+        output = letters_dict[move[0]] + move[1] + '\u00D7' + letters_dict[move[2]] + move[3]
+        if int(move[3]) > int(move[1]):
+            output += figs_dict['black_pawn']
+        else:
+            output += figs_dict['white_pawn']
+        return output
     if fig == 'empty':
         output = letters_dict[move[0]] + move[1] + '-' + letters_dict[move[2]] + move[3]
     else:
@@ -293,6 +318,12 @@ def event_handler_1(party, color, moves_window, surr_button):
     '''
     finished = False
     finished_program = False
+    if checkstalemate(color, party) and not checkmate(color, party):
+        move = 'draw_win'
+        return party, False, move
+    if checkmate(color, party):
+        move = change_color(color) + '_win'
+        return party, False, move
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -321,7 +352,11 @@ def event_handler_1(party, color, moves_window, surr_button):
                                 coords_1 = str(i[0]) + str(i[1])
                         coords_2 = str(field_num[0]) + str(field_num[1])
                         move = coords_1 + coords_2 + field.figuretype
-                        party.active_field.move(party, field, x, y)
+                        rules_exept = party.active_field.move(party, field, x, y)
+                        if rules_exept == 'castling':
+                            move += 'O-O'
+                        if rules_exept == 'enpassant':
+                            move += 'enpassant'
                         party.active_field = None
                         for field in party.fields.values():
                             field.lighten = False
