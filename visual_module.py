@@ -253,8 +253,8 @@ def draw_party_1(party, color, moves_vis, players_data = None):
             write_text(str(i + 1), (desk_x_coord, field_size * i), get_screen(), font)
         write_text(letters_dict[str(i + 1)], (desk_x_coord + int(field_size * (i + 0.8)), field_size * 7), get_screen(), font)
     if players_data != None:
-        write_text(players_data['player'] + '\n' + players_data['player_rating'], (desk_x_coord + field_size * 8 + 10, 675 * scale_y), get_screen(), font_pl)
-        write_text(players_data['opponent'] + '\n' + players_data['opponent_rating'], (desk_x_coord + field_size * 8 + 10, 225 * scale_y), get_screen(), font_pl)
+        write_text(players_data['player'] + '|' + players_data['player_rating'], (desk_x_coord + field_size * 8 + 10, 675 * scale_y), get_screen(), font_pl)
+        write_text(players_data['opponent'] + '|' + players_data['opponent_rating'], (desk_x_coord + field_size * 8 + 10, 225 * scale_y), get_screen(), font_pl)
     clock.tick(FPS)
 
 

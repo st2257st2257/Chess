@@ -48,7 +48,7 @@ def game(id, username):
     Game itself with *id* id and *username* - username of user entering game.
     '''
     party = Party()
-    players_data = {'player':username, 'player_rating': cl.check_rate(username)}
+    players_data = {'player':username, 'player_rating': str(cl.check_rate(username))}
     finished = False
     moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
     button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
@@ -58,10 +58,10 @@ def game(id, username):
     if white == username:
         color = 'white'
         black = cl.get_black(id)
-        players_data.update({'opponent':black, 'opponent_rating': cl.check_rate(black)})
+        players_data.update({'opponent':black, 'opponent_rating': str(cl.check_rate(black))})
     else:
         color = 'black'
-        players_data.update({'opponent':white, 'opponent_rating': cl.check_rate(white)})
+        players_data.update({'opponent':white, 'opponent_rating': str(cl.check_rate(white))})
     while not finished:
         if cl.check_flag(id, username):
             party, finished_program, move = event_handler_1(
@@ -70,6 +70,11 @@ def game(id, username):
                 break
             cl.update_party_figures(id, figures_to_string(party.fields))
             cl.add_move(id, move)
+            if 'win' in move:
+                if 'draw' in move:
+                    cl.update_rate(username, players_data['opponent'], 0)
+                else:
+                    cl.update_rate(username, players_data['opponent'], 2)
             if finished_program:
                 pygame.quit()
                 raise SystemExit
@@ -82,11 +87,13 @@ def game(id, username):
                     if event.type == pygame.QUIT:
                         finished_1 = True
                         cl.add_move(id, change_color(color) + '_win')
+                        cl.update_rate(username, players_data['opponent'], 2)
                         pygame.quit()
                         raise SystemExit
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if surrender_button.check():
                             cl.add_move(id, change_color(color) + '_win')
+                            cl.update_rate(username, players_data['opponent'], 2)
                     moves_vis.event_handler(event, None)
                 draw_party_1(party, color, moves_vis, players_data)
                 surrender_button.draw()

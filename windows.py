@@ -199,7 +199,7 @@ def main_menu(username):
         id_field.draw()
         write_text(error_text, (int(1110 * scale_x), int(575 * scale_y)), screen, text_font)
         write_text('Enter id', (int(1110 * scale_x), int(510 * scale_y)), screen, text_font)
-        write_text(username + '\n' + rate, (int(1280 * scale_x), int(360 * scale_y)), screen, header_font)
+        write_text(username + '|' + str(rate), (int(1280 * scale_x), int(360 * scale_y)), screen, header_font)
         clock.tick(FPS)
         pygame.display.update()
         fill()
