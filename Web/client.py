@@ -226,6 +226,33 @@ def get_last_move_number(party_id):
     return int(data)
 
 
+# 18
+def check_rate(login):
+    global vis
+    client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_sock.connect(('46.138.245.249', 11111))
+    client_sock.sendall(json.dumps([18, [login]]).encode())
+    data = json.loads(client_sock.recv(1024))
+    client_sock.close()
+    if vis:
+        print('Rate =', str(data))
+    return int(data)
+
+
+# 19
+def update_rater(login_1, login_2, flag):
+    # flag: 
+    # 0 - draw
+    # 1 - login_1 won
+    # 2 - login_2 won
+    global vis
+    client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_sock.connect(('46.138.245.249', 11111))
+    client_sock.sendall(json.dumps([19, [login_1, login_2, flag]]).encode())
+    data = json.loads(client_sock.recv(1024))
+    client_sock.close()
+
+
 # set_black(472, "abcc")
 # check_user()
 # check_user_party(472, "abcc")
@@ -234,4 +261,3 @@ def get_last_move_number(party_id):
 # get_party_figures()
 # create_party("asdf", "DFds", 5)
 # add_move(472, "76-58" + ";")
-

@@ -13,7 +13,11 @@ for i in range(1,9):
 char_dict = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h'}
 
 class Move:
-    """docstring for Move"""
+    '''
+    Класс хода, имеющий параметры типа сходившей фигуры *figuretype*,
+    координат откуда сделан ход *coords*, координат куда сделан ход *newcoords*,
+    съеденной фигуры *eatenfigure* и времени хода *time*
+    '''
     def __init__(self, figuretype, coords, newcoords, eatenfigure):
         self.figuretype = figuretype
         self.coords = coords
@@ -23,7 +27,10 @@ class Move:
 
 
 class Player:
-    """docstring for Player"""
+    '''
+    Класс игрока, имеющий значения логина, пароля, рейтинг 
+    и цвета команды в партии
+    '''
     def __init__(self, color, rate):
         self.web_login = ""
         self.web_password = ""
@@ -33,15 +40,15 @@ class Player:
 
 class Field:
     '''
-    Класса поля, имеющий координаты *coords* и фигуру *figure*
-
+    Класса поля, имеющий координаты *coords* и фигуру *figure*,
+    а также вспомогательные флаги
     '''
     def __init__(self, figuretype):
         self.figuretype = figuretype
         self.figmoved = False # Флаг, что в поле фигура, делавшая ход
         self.lighten = False # Флаг, что поле подсвечено для хода какой-либо фигуры
-        self.castling = False
-        self.enpassant = False
+        self.castling = False # Флаг, что поле для хода-рокировки
+        self.enpassant = False # Флаг, что поле для взятия на проходе
         self.long_pawn_move = False # Флаг, что это поле доступно для длинного хода
         self.pawn_moved = False # Флаг, что на предыдущем ходе в это поле пешка сделала длинный ход
 
@@ -79,6 +86,10 @@ class Field:
             field.figuretype = self.figuretype
             field.figmoved = True
             self.figuretype = 'empty'
+            if field.figuretype == 'black_pawn' and y == 1:
+                field.figuretype = 'black_queen'
+            if field.figuretype == 'white_pawn' and y == 8:
+                field.figuretype = 'white_queen' 
             move_type = ''
         if (('pawn' in field.figuretype) and 
                 field.long_pawn_move):
@@ -90,8 +101,10 @@ class Field:
         return move_type
 
 class Party:
-    """Класс содержит в себе словарь со всеми полями *fields*,
-    список со всеми предыдущими ходами *moves*"""
+    '''
+    Класс содержит в себе словарь со всеми полями *fields*,
+    список со всеми предыдущими ходами *moves*
+    '''
     def __init__(self):
         self.fields = init_party_dict.copy()
         for key in self.fields.keys():
@@ -100,11 +113,7 @@ class Party:
         self.end_flag = False
         self.web_id = 0
         self.moves = []
-        #self.wking_pos = get_king_pos('white', self)
-        #self.bking_pos = get_king_pos('black', self)
-        #self.wattacked = get_attacked_fields('white', self)
-        #self.battacked = get_attacked_fields('black', self)
-        self.last_pawn = None
+        self.last_pawn = None # Поле последнего длинного хода пешкой
 
 
         

@@ -318,7 +318,63 @@ def print_request(client_id="C_I", request="...", answer="...", ping="0"):
     cursor.execute("SELECT * FROM History WHERE id = (SELECT MAX(id) FROM History);");
     answer = cursor.fetchone()
     print(answer)
+
+def check_rate(login):
+    global vis, conn, cursor
+    if vis: 
+        print("\nChecking user rate login=" +str(login)+ "...")
     
+    cursor.execute("SELECT * FROM chess_players WHERE login = '" + login + "';");
+    answer = cursor.fetchone()
+    if vis:
+        print(answer[3])
+    return answer[3]
+
+
+def set_rate(login, value):
+    global vis, conn, cursor
+    if vis:
+        print("Setting new rate:" + str(rate) + " for user " + login)
+    cursor.execute("UPDATE chess_players SET rate="+str(value)+" WHERE login='" + login + "';")
+
+
+def update_rate(login_1, login_2, flag):
+    global vis, conn, cursor
+    if vis: 
+        print("\n Updating users rate login_0=" +str(login_1) + " login_1=" + str(login_2)+ "...")
+    
+    cursor.execute("SELECT * FROM chess_players WHERE login = '" + login_1 + "';");
+    user_1 = cursor.fetchone()
+    
+    cursor.execute("SELECT * FROM chess_players WHERE login = '" + login_2 + "';");
+    user_2 = cursor.fetchone()
+    
+    K = 0
+    if min(user_2[3], user_1[3]) > 2500:
+        K = 10
+    elif min(user_2[3], user_1[3]) > 2000:
+        K = 20
+    elif min(user_2[3], user_1[3]) > 1500:
+        K = 30
+    else:
+        K = 40
+    
+    vin_1 = 0.5
+    vin_2 = 0.5
+    if flag == 1:
+        vin_1 = 1
+        vin_2 = 0
+    elif flag == 2:
+        vin_1 = 0
+        vin_2 = 1
+    value_1 = user_1[3] + K*((vin_1) - (1/(1+10**((user_2[3] - user_1[3])/400))))
+    value_2 = user_2[3] + K*((vin_2) - (1/(1+10**((user_1[3] - user_2[3])/400))))
+    
+    if vis:
+        print("New rate: ", value_1, value_2)
+    
+    set_rate(login_1, int(value_1)+1)
+    set_rate(login_2, int(value_2)+1)
     
 # init()
 # add_move(472, "56-58" + ";")
