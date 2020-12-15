@@ -163,6 +163,7 @@ def main_menu(username):
     id_field = InputBox(int(1110 * scale_x), int(540 * scale_y), field_len)
     error_text = ''
     finished = False
+    rate = cl.check_rate(username)
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -170,7 +171,6 @@ def main_menu(username):
                 raise SystemExit
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if join_game.check():
-                    # Error in DB access in check user party ValueError exception
                     if cl.check_user_party(id_field.text, 'wait') != 0:
                         id = id_field.text
                         colors_gen = random.randint(0, 1)
@@ -183,6 +183,7 @@ def main_menu(username):
                         cl.add_move(id, '')
                         game(id, username)
                         error_text = ''
+                        rate = cl.check_rate(username)
                     else:
                         error_text = 'Unable to find game'
                     id_field.text = ''
@@ -191,13 +192,14 @@ def main_menu(username):
                     error_text = ''
                     id = cl.create_party(username, 'wait', 0)
                     waiting_room(id, username)
+                    rate = cl.check_rate(username)
             id_field.event_handler(event)
         create_game.draw()
         join_game.draw()
         id_field.draw()
         write_text(error_text, (int(1110 * scale_x), int(575 * scale_y)), screen, text_font)
         write_text('Enter id', (int(1110 * scale_x), int(510 * scale_y)), screen, text_font)
-        write_text(username, (int(1280 * scale_x), int(360 * scale_y)), screen, header_font)
+        write_text(username + '\n' + rate, (int(1280 * scale_x), int(360 * scale_y)), screen, header_font)
         clock.tick(FPS)
         pygame.display.update()
         fill()

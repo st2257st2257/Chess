@@ -31,8 +31,8 @@ def string_to_figures(string, cf_dict):
     for fig in figs:
         data = fig.split(',')
         coords = (int(data[0][0]), int(data[0][1]))
-        field = Field(data[1])
-        field.figmoved = cf_dict[coords].figmoved
+        field = cf_dict[coords]
+        field.figuretype = data[1]
         output.update({coords:field})
     return output
 
@@ -48,19 +48,24 @@ def game(id, username):
     Game itself with *id* id and *username* - username of user entering game.
     '''
     party = Party()
-    
+    players_data = {'player':username, 'player_rating': cl.check_rate(username)}
     finished = False
     moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
     button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
     moves_vis = Scroll_window(0, 0, [], moves_font, int(desk_x_coord), int(450 * scale_y), False)
     surrender_button = button(int(50 * scale_x), int(500 * scale_y), 'Surrender', button_font)
-    if cl.get_white(id) == username:
+    white = cl.get_white(id)
+    if white == username:
         color = 'white'
+        black = cl.get_black(id)
+        players_data.update({'opponent':black, 'opponent_rating': cl.check_rate(black)})
     else:
         color = 'black'
+        players_data.update({'opponent':white, 'opponent_rating': cl.check_rate(white)})
     while not finished:
         if cl.check_flag(id, username):
-            party, finished_program, move = event_handler_1(party, color, moves_vis, surrender_button)
+            party, finished_program, move = event_handler_1(
+                    party, color, moves_vis, surrender_button, players_data)
             if 'win' in cl.get_last_move(id):
                 break
             cl.update_party_figures(id, figures_to_string(party.fields))
@@ -83,7 +88,7 @@ def game(id, username):
                         if surrender_button.check():
                             cl.add_move(id, change_color(color) + '_win')
                     moves_vis.event_handler(event, None)
-                draw_party_1(party, color, moves_vis)
+                draw_party_1(party, color, moves_vis, players_data)
                 surrender_button.draw()
                 pygame.display.update()
                 frame_counter += 1

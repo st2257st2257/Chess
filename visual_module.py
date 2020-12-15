@@ -253,8 +253,8 @@ def draw_party_1(party, color, moves_vis, players_data = None):
             write_text(str(i + 1), (desk_x_coord, field_size * i), get_screen(), font)
         write_text(letters_dict[str(i + 1)], (desk_x_coord + int(field_size * (i + 0.8)), field_size * 7), get_screen(), font)
     if players_data != None:
-        write_text(players_data['player'] + '/n' + players_data['player_rating'], (desk_x_coord + field_size * 8 + 10, 675 * scale_y), get_screen(), font_pl)
-        write_text(players_data['opponent'] + '/n' + players_data['opponent_rating'], (desk_x_coord + field_size * 8 + 10, 225 * scale_y), get_screen(), font_pl)
+        write_text(players_data['player'] + '\n' + players_data['player_rating'], (desk_x_coord + field_size * 8 + 10, 675 * scale_y), get_screen(), font_pl)
+        write_text(players_data['opponent'] + '\n' + players_data['opponent_rating'], (desk_x_coord + field_size * 8 + 10, 225 * scale_y), get_screen(), font_pl)
     clock.tick(FPS)
 
 
@@ -309,7 +309,7 @@ def change_color(color):
         return 'black'
 
 
-def event_handler_1(party, color, moves_window, surr_button):
+def event_handler_1(party, color, moves_window, surr_button, players_data):
     '''
     Temporary event handler for multiplayer for one move
     . Takes *party* - element of Party class. *color* - 
@@ -370,7 +370,7 @@ def event_handler_1(party, color, moves_window, surr_button):
                     finished = True
                     move = change_color(color) + '_win'
             moves_window.event_handler(event, None)
-        draw_party_1(party, color, moves_window)
+        draw_party_1(party, color, moves_window, players_data)
         surr_button.draw()
         pygame.display.update()
     return party, finished_program, move
