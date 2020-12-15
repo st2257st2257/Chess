@@ -237,7 +237,7 @@ def event_handler(party, prior_flag):
                 x, y = field_num
                 if field_mouse_check(field, x, y) and (
                     prior_flag in field.figuretype):
-                    steps = get_moves(field, party.fields, x, y)
+                    steps = get_moves(field, party, x, y)
                     for field_ in party.fields.values():
                         field_.lighten = False
                         if field_ in steps:
@@ -245,10 +245,14 @@ def event_handler(party, prior_flag):
                     party.active_field = field
                     return (party, prior_flag, False)
                 elif field_mouse_check(field, x, y) and field.lighten:
-                    party.active_field.move(party, field)
+                    move_type = party.active_field.move(party, field, x, y)
+                    print(move_type)
                     party.active_field = None
                     for field in party.fields.values():
                         field.lighten = False
+                        field.long_pawn_move = False
+                        field.enpassant = False
+                        field.castling = False            
                     prior_flag = change_flag(prior_flag)
                     return (party, prior_flag, False)
 
@@ -296,10 +300,13 @@ def event_handler_1(party, color, moves_window, surr_button):
                                 coords_1 = str(i[0]) + str(i[1])
                         coords_2 = str(field_num[0]) + str(field_num[1])
                         move = coords_1 + coords_2 + field.figuretype
-                        party.active_field.move(party, field)
+                        party.active_field.move(party, field, x, y)
                         party.active_field = None
                         for field in party.fields.values():
                             field.lighten = False
+                            field.long_pawn_move = False
+                            field.enpassant = False
+                            field.castling = False
                         finished = True
                 if surr_button.check():
                     finished = True
