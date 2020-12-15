@@ -340,7 +340,7 @@ def event_handler_1(party, color, moves_window, surr_button):
                         color in field.figuretype):
                         if color == 'black':
                             y = 9 - y
-                        steps = get_moves(field, party.fields, x, y)
+                        steps = get_moves(field, party, x, y)
                         for field_ in party.fields.values():
                             field_.lighten = False
                             if field_ in steps:
