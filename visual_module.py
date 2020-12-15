@@ -347,6 +347,8 @@ def event_handler_1(party, color, moves_window, surr_button):
                                 field_.lighten = True
                         party.active_field = field
                     elif field_mouse_check(field, x, y) and field.lighten:
+                        if color == 'black':
+                            y = 9 - y
                         for i in party.fields.keys():
                             if party.active_field == party.fields[i]:
                                 coords_1 = str(i[0]) + str(i[1])

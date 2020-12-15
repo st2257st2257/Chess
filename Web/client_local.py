@@ -240,7 +240,7 @@ def check_rate(login):
 
 
 # 19
-def update_rater(login_1, login_2, flag):
+def update_rate(login_1, login_2, flag):
     # flag: 
     # 0 - draw
     # 1 - login_1 won

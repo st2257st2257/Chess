@@ -48,6 +48,7 @@ def game(id, username):
     Game itself with *id* id and *username* - username of user entering game.
     '''
     party = Party()
+    
     finished = False
     moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
     button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
