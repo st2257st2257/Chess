@@ -1,7 +1,7 @@
 import socket
 import json
 import sqlite3
-from functions_debug import *
+from functions import *
 import datetime
 
 init()
@@ -98,7 +98,14 @@ while True:
                 
             elif function_number == 17:
                 res = get_last_move_number(param_list[0])
+            
+            elif function_number == 18:
+                res = check_rate(param_list[0])
                 
+            
+            elif function_number == 19:
+                res = update_rate(param_list[0], param_list[1], param_list[2])
+    
         except Exception:
             res = "Error in DB access"
             
@@ -106,7 +113,7 @@ while True:
             print_request(str(client_addr[0]), str(data).split("'"), res,
                           datetime.datetime.now() - current_time) 
         except Exception:
-            print("Printing Error")
+            print(client_addr, data, res)
         
         cancel()
         try:
@@ -118,3 +125,4 @@ while True:
             break
 
     client_sock.close()
+
