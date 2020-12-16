@@ -4,6 +4,7 @@ import time
 import pygame
 from Web import client_local as cl
 from game_objects import *
+import sys
 
 def figures_to_string(cf_dict):
     '''
@@ -76,7 +77,8 @@ def game(id, username):
                 else:
                     cl.update_rate(username, players_data['opponent'], 2)
             if finished_program:
-                raise SystemExit
+                pygame.quit()
+                sys.exit()
             moves_vis.data.append(move)
         else:
             finished_1 = False
@@ -87,7 +89,8 @@ def game(id, username):
                         finished_1 = True
                         cl.add_move(id, change_color(color) + '_win')
                         cl.update_rate(username, players_data['opponent'], 2)
-                        raise SystemExit
+                        pygame.quit()
+                        sys.exit()
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if surrender_button.check():
                             cl.add_move(id, change_color(color) + '_win')
@@ -147,7 +150,8 @@ def post_game_lobby(id, color, party):
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                raise SystemExit
+                pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if to_main_button.check():
                     finished = True

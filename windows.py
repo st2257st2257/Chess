@@ -5,6 +5,7 @@ from game import *
 from Web import client_local as cl
 import random
 import _thread
+import sys
 
 clock = pygame.time.Clock()
 
@@ -46,7 +47,7 @@ def register_window():
             if event.type == pygame.QUIT:
                 finished = True
                 pygame.quit()
-                raise SystemExit
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if reg_button.check():
                     error_text = ''
@@ -112,7 +113,7 @@ def start_window():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                raise SystemExit
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check():
                     if len(username_field.text) < 5:
@@ -168,7 +169,7 @@ def main_menu(username):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                raise SystemExit
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if join_game.check():
                     if cl.check_user_party(id_field.text, 'wait') != 0:
@@ -230,7 +231,7 @@ def waiting_room(id, username):
             if event.type == pygame.QUIT:
                 cl.set_black(id, 'None')
                 pygame.quit()
-                raise SystemExit
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check():
                     cl.set_black(id, 'None')
