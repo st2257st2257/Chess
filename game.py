@@ -5,8 +5,6 @@ import pygame
 from Web import client_local as cl
 from game_objects import *
 
-FPS = 30
-
 def figures_to_string(cf_dict):
     '''
     Transforms *cf_dict* into database format. *cf_dict* - dictionary
@@ -16,7 +14,8 @@ def figures_to_string(cf_dict):
     for number in cf_dict.keys():
         x, y = number
         field = cf_dict[number]
-        output += str(x) + str(y) + ',' + field.figuretype + ';'
+        pm = str(int(field.pawn_moved))
+        output += str(x) + str(y) + ',' + field.figuretype + ',' + pm + ';'
     return output[:-1]
 
 
@@ -33,6 +32,7 @@ def string_to_figures(string, cf_dict):
         coords = (int(data[0][0]), int(data[0][1]))
         field = cf_dict[coords]
         field.figuretype = data[1]
+        field.pawn_moved = bool(data[2])
         output.update({coords:field})
     return output
 
@@ -76,7 +76,6 @@ def game(id, username):
                 else:
                     cl.update_rate(username, players_data['opponent'], 2)
             if finished_program:
-                pygame.quit()
                 raise SystemExit
             moves_vis.data.append(move)
         else:
@@ -88,7 +87,6 @@ def game(id, username):
                         finished_1 = True
                         cl.add_move(id, change_color(color) + '_win')
                         cl.update_rate(username, players_data['opponent'], 2)
-                        pygame.quit()
                         raise SystemExit
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if surrender_button.check():
@@ -105,9 +103,12 @@ def game(id, username):
                     if 'win' in cl.get_last_move(id):
                         finished_1 = True
                         finished = True
-                    if finished_1:
+                    if finished_1 and not finished:
+                        last_move = cl.get_last_move(id)
+                        moves_vis.data.append(last_move)
+                        if 'pawn' in party.fields[(int(last_move[0]), int(last_move[1]))].figuretype and abs(int(last_move[3]) - int(last_move[1])) == 2:
+                            party.last_pawn = party.fields[(int(last_move[2]), int(last_move[3]))]
                         party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
-                        moves_vis.data.append(cl.get_last_move(id))
     post_game_lobby(id, color, party)
 
 
@@ -126,10 +127,10 @@ def post_game_lobby(id, color, party):
         if 'enpassant' in move:
             fig = 'empty'
             if int(move[3]) > int(move[1]):
-                fig_killed = 'black'
+                fig_killed = 'black_pawn'
             else:
-                fig_killed = 'white'
-            party.fields[int(move[0]), int(move[3])].figuretype = fig_killed
+                fig_killed = 'white_pawn'
+            party.fields[int(move[3]), int(move[0])].figuretype = fig_killed
         if 'O-O' in move:
             if move[2] == '7':
                 party.fields[8, int(move[1])].figuretype = party.fields[6, int(move[1])].figuretype
@@ -146,7 +147,6 @@ def post_game_lobby(id, color, party):
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
                 raise SystemExit
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if to_main_button.check():
