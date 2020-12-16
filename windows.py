@@ -343,12 +343,12 @@ def waiting_room(id, username):
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                cl.set_black(id, 'None')
+                cl.execute_sql("DELETE FROM Chess WHERE id='"+str(id)+"';", "askristal")
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check():
-                    cl.set_black(id, 'None')
+                cl.execute_sql("DELETE FROM Chess WHERE id='"+str(id)+"';", "askristal")
                     finished = True
                     start = False
         raw_time += 1 / FPS
