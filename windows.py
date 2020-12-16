@@ -171,7 +171,7 @@ def main_menu(username):
     finished = False
     rate = cl.check_rate(username)
     history = cl.get_party_id(username)
-    history = history[0:9]
+    history = history[-10:]
     history.reverse()
     history_vis = []
     for game_num in history:

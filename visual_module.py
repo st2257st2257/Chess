@@ -43,44 +43,63 @@ figs_dict = {
 
 clock = pygame.time.Clock()
 
-back_image = pygame.image.load('interface/background.png')
+back_image = pygame.image.load(theme + 'back.png')
 back_image = back_image.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 background = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
 pygame.transform.smoothscale(
         back_image, (window_width, window_height), background)
 
-button_img = pygame.image.load('interface/Button.png')
+button_img = pygame.image.load(theme + 'Button.png')
 button_img = button_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
-button_pushed_img = pygame.image.load('interface/Button_pushed.png')
+button_pushed_img = pygame.image.load(theme + 'Button_pushed.png')
 button_pushed_img = button_pushed_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
-field_img = pygame.image.load('interface/field.png')
+field_img = pygame.image.load(theme + 'field.png')
 field_img = field_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
-field_active_img = pygame.image.load('interface/field_active.png')
+field_active_img = pygame.image.load(theme + 'field_active.png')
 field_img = field_active_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
-rect_img = pygame.image.load('interface/rect.png')
+rect_img = pygame.image.load(theme + 'rect.png')
 rect_img = rect_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
-rect_active_img = pygame.image.load('interface/rect.png')
+rect_active_img = pygame.image.load(theme + 'rect.png')
 rect_active_img = rect_active_img.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 
-login_image = pygame.image.load('background.png')
-login_image = back_image.convert_alpha(
+login_image = pygame.image.load('themes/background.png')
+login_image = login_image.convert_alpha(
         pygame.display.set_mode((window_width, window_height)))
 login_pic = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
 pygame.transform.smoothscale(
         login_image, (window_width, window_height), login_pic)
 
+sq_size = (int(field_size), int(field_size))
+
+light_field_img = pygame.image.load(desk_style + 'light_field.png')
+light_field_img = light_field_img.convert_alpha(pygame.display.set_mode((window_width, window_height)))
+light_field_image = pygame.Surface(sq_size, pygame.SRCALPHA)
+pygame.transform.smoothscale(
+        light_field_img, sq_size, light_field_image)
+
+white_field_img = pygame.image.load(desk_style + 'white_field.png')
+white_field_img = white_field_img.convert_alpha(pygame.display.set_mode((window_width, window_height)))
+white_field_image = pygame.Surface(sq_size, pygame.SRCALPHA)
+pygame.transform.smoothscale(
+        white_field_img, sq_size, white_field_image)
+
+black_field_img = pygame.image.load(desk_style + 'black_field.png')
+black_field_img = black_field_img.convert_alpha(pygame.display.set_mode((window_width, window_height)))
+black_field_image = pygame.Surface(sq_size, pygame.SRCALPHA)
+pygame.transform.smoothscale(
+        black_field_img, sq_size, black_field_image)
 
 
 with open('chess_figs.yaml', 'r') as file:
@@ -151,10 +170,12 @@ def draw_field(field, field_x, field_y):
     y = int((8 - field_y) *  field_size)
     rectan = (x, y, *size)
     color_rgb = (field_x + field_y) % 2 * 150 + 100
-    color = (color_rgb, color_rgb, color_rgb)
+    if (field_x + field_y) % 2 == 1:
+        get_screen().blit(black_field_image, (x, y))
+    else:
+        get_screen().blit(white_field_image, (x, y))
     if field.lighten:
-        color = lighten
-    pygame.draw.rect(screen, color, rectan)
+        get_screen().blit(light_field_image, (x, y))
     screen.blit(fig_images[field.figuretype], (x, y))
     
     
