@@ -121,7 +121,6 @@ def post_game_lobby(id, color):
     moves.remove('')
     moves.pop()
     party = Party()
-    print(cl.get_party_figures(id))
     party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
     moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
     button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
@@ -135,7 +134,7 @@ def post_game_lobby(id, color):
                 fig_killed = 'black_pawn'
             else:
                 fig_killed = 'white_pawn'
-            party.fields[int(move[3]), int(move[0])].figuretype = fig_killed
+            party.fields[int(move[2]), int(move[1])].figuretype = fig_killed
         if 'O-O' in move:
             if move[2] == '7':
                 party.fields[8, int(move[1])].figuretype = party.fields[6, int(move[1])].figuretype
