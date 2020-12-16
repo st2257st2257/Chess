@@ -387,7 +387,7 @@ def get_party_id(login):
     
     if vis:
         print("    New party: ", answer)
-    return str(answer)
+    return answer
     
 # init()
 # add_move(472, "56-58" + ";")
