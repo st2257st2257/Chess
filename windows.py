@@ -158,6 +158,7 @@ def main_menu(username):
     text_font = pygame.font.SysFont('Arial', int(scale_x * 40))
     button_font = pygame.font.SysFont('Arial', int(scale_x * 50))
     header_font = pygame.font.SysFont('Arial', int(scale_x * 80))
+    scroll_font = pygame.font.SysFont('FreeSerif', int(scale_x * 50))
     screen = get_screen()
     create_game = button(int(960 * scale_x), int(360 * scale_y), 'Create game', button_font)
     join_game = button(int(960 * scale_x), int(540 * scale_y), 'Join game', button_font)
@@ -165,6 +166,24 @@ def main_menu(username):
     error_text = ''
     finished = False
     rate = cl.check_rate(username)
+    history = cl.get_party_id(username)
+    history = list(map(str, history))
+    history = history[0:9]
+    history.reverse()
+    history_vis = []
+    for game_num in history:
+        white = cl.get_white(int(game_num))
+        black = cl.get_black(int(game_num))
+        his_str = '\u2654' + white + ' | ' + black + '\u265A'
+        result = cl.get_last_move(int(game_num))
+        if 'white' in result:
+            his_str += '   White_win'
+        elif 'black' in result:
+            his_str += '   Black win'
+        else:
+            his_str += '   Draw'
+        history_vis.append(his_str)
+    hist_window = Scroll_window(int(100 * scale_x), int(100 * scale_y), history_vis, scroll_font, int(500 * scale_x), int(400 * scale_y), True)
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -194,10 +213,19 @@ def main_menu(username):
                     id = cl.create_party(username, 'wait', 0)
                     waiting_room(id, username)
                     rate = cl.check_rate(username)
+            game_num = hist_window.event_handler(event, None)
+            if game_num != None:
+                game_id = int(history[game_num])
+                print(game_id)
+                if cl.get_white(game_id) == username:
+                    post_game_lobby(game_id, 'white')
+                else:
+                    post_game_lobby(game_id, 'black')
             id_field.event_handler(event)
         create_game.draw()
         join_game.draw()
         id_field.draw()
+        hist_window.draw()
         write_text(error_text, (int(1110 * scale_x), int(575 * scale_y)), screen, text_font)
         write_text('Enter id', (int(1110 * scale_x), int(510 * scale_y)), screen, text_font)
         write_text(username + '|' + str(rate), (int(1280 * scale_x), int(360 * scale_y)), screen, header_font)

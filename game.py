@@ -112,14 +112,16 @@ def game(id, username):
                         if 'pawn' in party.fields[(int(last_move[0]), int(last_move[1]))].figuretype and abs(int(last_move[3]) - int(last_move[1])) == 2:
                             party.last_pawn = party.fields[(int(last_move[2]), int(last_move[3]))]
                         party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
-    post_game_lobby(id, color, party)
+    post_game_lobby(id, color)
 
 
-def post_game_lobby(id, color, party):
+def post_game_lobby(id, color):
     moves = cl.get_moves(id).split('\', \'')
     moves.remove('[\'')
     moves.remove('')
     moves.pop()
+    party = Party()
+    print(cl.get_party_figures(id))
     party.fields = string_to_figures(cl.get_party_figures(id), party.fields)
     moves_font = pygame.font.SysFont('FreeSerif', int(80 * scale_x))
     button_font = pygame.font.SysFont('Arial', int(50 * scale_x))
