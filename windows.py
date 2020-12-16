@@ -21,6 +21,7 @@ for i in range(9):
     load_anim.append(('load_anim/load_' + str(i) + '.png', anim_delay))
 load_anim = pyganim.PygAnimation(load_anim)
 
+
 def register_window():
     '''
     Draws window for creating new user.
@@ -33,11 +34,11 @@ def register_window():
     header_font = pygame.font.SysFont('Arial', int(scale_x * 80))
     button_font = pygame.font.SysFont('Arial', int(scale_x * 50))
     reg_button = button(
-            x0, int(720 * scale_y), 
+            x0, int(720 * scale_y),
             'Add user', button_font
     )
     back_button = button(
-            int(1000 * scale_x), int(720 * scale_y), 
+            int(1000 * scale_x), int(720 * scale_y),
             'Back', button_font
     )
     text_font = pygame.font.SysFont('Arial', int(40 * scale_x))
@@ -78,8 +79,8 @@ def register_window():
         rep_pass_field.draw()
         pass_field.text = password
         rep_pass_field.text = pass_repeat
-        write_text('Password', (x0, 
-            int(420 * scale_y)), screen, text_font)
+        write_text('Password', (
+            x0, int(420 * scale_y)), screen, text_font)
         write_text('Username', (
             x0, int(320 * scale_y)), screen, text_font)
         write_text('Repeat password', (
@@ -93,7 +94,7 @@ def register_window():
 
 def start_window():
     '''
-    Creates main window for entering password and username. 
+    Creates main window for entering password and username.
     '''
     username_field = InputBox(x0, 400 * scale_y, field_len)
     pass_field = InputBox(x0, 500 * scale_y, field_len)
@@ -104,7 +105,7 @@ def start_window():
     start_button = button(
             x0, int(720 * scale_y), 'Play', button_font)
     reg_button = button(
-            int(1000 * scale_x), int(720 * scale_y), 
+            int(1000 * scale_x), int(720 * scale_y),
             'Sign up', button_font
     )
     text_font = pygame.font.SysFont('Arial', int(40 * scale_x))
@@ -120,7 +121,8 @@ def start_window():
                         error_text = 'Username is too short'
                     elif len(pass_field.text) < 5:
                         error_text = 'Password is too short'
-                    elif not cl.check_user_lp(username_field.text, pass_field.text):
+                    elif not cl.check_user_lp(
+                            username_field.text, pass_field.text):
                         error_text = 'Wrong password or username'
                     else:
                         finished = True
@@ -138,8 +140,8 @@ def start_window():
         start_button.draw()
         reg_button.draw()
         pass_field.text = password
-        write_text('Password', (x0, 
-            int(470 * scale_y)), screen, text_font)
+        write_text('Password', (
+            x0, int(470 * scale_y)), screen, text_font)
         write_text('Username', (
             x0, int(370 * scale_y)), screen, text_font)
         write_text(error_text, (
@@ -152,7 +154,7 @@ def start_window():
 
 def main_menu(username):
     '''
-    Draws main menu for creating or entering game. Takes 
+    Draws main menu for creating or entering game. Takes
     *username* - username of user entering main menu.
     '''
     text_font = pygame.font.SysFont('Arial', int(scale_x * 40))
@@ -240,7 +242,7 @@ def main_menu(username):
                     id = cl.create_party(username, 'wait', 0)
                     start = waiting_room(id, username)
                     if start:
-                        rate = cl.check_rate(username)                        
+                        rate = cl.check_rate(username)
                         history.insert(0, id)
                         white = cl.get_white(id)
                         black = cl.get_black(id)
@@ -261,15 +263,15 @@ def main_menu(username):
                         player_rate = cl.check_rate(player)
                         games_vis.append(player + '|' + str(player_rate))
                     game_choise_window.data = games_vis
-            game_num = hist_window.event_handler(event, None)
-            if game_num != None:
+            game_num = hist_window.event_handler(event)
+            if game_num is not None:
                 game_id = history[game_num]
                 if cl.get_white(game_id) == username:
                     post_game_lobby(game_id, 'white')
                 else:
                     post_game_lobby(game_id, 'black')
-            game_num = game_choise_window.event_handler(event, None)
-            if game_num != None:
+            game_num = game_choise_window.event_handler(event)
+            if game_num is not None:
                 game_id = active_games[game_num]
                 if cl.check_user_party(game_id, 'wait') != 0:
                     id = game_id
@@ -310,15 +312,17 @@ def main_menu(username):
         write_text('Enter id', (
             int(1110 * scale_x), int(510 * scale_y)), screen, text_font)
         write_text(
-            username + '|' + str(rate), (int(1280 * scale_x),
-            int(360 * scale_y)), screen, header_font
-        )
+            username + '|' + str(rate), (
+                int(1280 * scale_x), int(360 * scale_y)), screen, header_font)
         clock.tick(FPS)
         pygame.display.update()
         fill()
 
 
 def check_start(id, a):
+    '''
+    Functon for thread to check if second user is found.
+    '''
     global start, finished
     finished = not cl.check_user_party(id, 'wait')
     start = finished
@@ -334,7 +338,8 @@ def waiting_room(id, username):
     header_font = pygame.font.SysFont('Arial', int(scale_x * 80))
     button_font = pygame.font.SysFont('Arial', int(scale_x * 50))
     text_font = pygame.font.SysFont('Arial', int(scale_x * 40))
-    back_button = button(int(100 * scale_x), int(100 * scale_x), 'Back', button_font)
+    back_button = button(
+            int(100 * scale_x), int(100 * scale_x), 'Back', button_font)
     load_anim.play()
     screen = get_screen()
     raw_time = 0
@@ -343,12 +348,16 @@ def waiting_room(id, username):
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                cl.execute_sql("DELETE FROM Chess WHERE id='"+str(id)+"';", "askristal")
+                cl.execute_sql(
+                    "DELETE FROM Chess WHERE id='"+str(id)+"';", "askristal")
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check():
-                cl.execute_sql("DELETE FROM Chess WHERE id='"+str(id)+"';", "askristal")
+                    cl.execute_sql(
+                        "DELETE FROM Chess WHERE id='"+str(id)+"';",
+                        "askristal"
+                    )
                     finished = True
                     start = False
         raw_time += 1 / FPS
@@ -368,4 +377,3 @@ def waiting_room(id, username):
     if start:
         game(id, username)
     return start
-
