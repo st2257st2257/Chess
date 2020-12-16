@@ -252,6 +252,16 @@ def update_rate(login_1, login_2, flag):
     data = json.loads(client_sock.recv(1024))
     client_sock.close()
 
+# 20
+def get_party_id(login):
+    global vis, current_ip
+    client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_sock.connect((current_ip, 11111))
+    client_sock.sendall(json.dumps([20, [login]]).encode())
+    data = json.loads(client_sock.recv(1024))
+    client_sock.close()
+    return data
+    
 # set_black(472, "abcc")
 # check_user()
 # check_user_party(472, "abcc")

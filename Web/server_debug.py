@@ -102,9 +102,11 @@ while True:
             elif function_number == 18:
                 res = check_rate(param_list[0])
                 
-            
             elif function_number == 19:
                 res = update_rate(param_list[0], param_list[1], param_list[2])
+                
+            elif function_number == 20:
+                res = get_party_id(param_list[0])
     
         except Exception:
             res = "Error in DB access"

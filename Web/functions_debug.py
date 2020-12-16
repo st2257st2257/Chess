@@ -373,6 +373,22 @@ def print_request(client_id="C_I", request="...", answer="..."):
     answer = cursor.fetchone()
     print(answer)
     
+    
+def get_party_id(login):
+    global vis, conn, cursor
+    if vis:
+        print("\n Getting party_id...")
+    
+    cursor.execute("SELECT * FROM Chess WHERE player_white_login = '" + str(login) + "';");
+    answer = [a[0] for a in cursor.fetchall()]
+    cursor.execute("SELECT * FROM Chess WHERE player_black_login = '" + str(login) + "';");
+    answer += [a[0] for a in cursor.fetchall()]
+    answer.sort()
+    
+    if vis:
+        print("    New party: ", answer)
+    return str(answer)
+    
 # init()
 # add_move(472, "56-58" + ";")
 # create_party('white', 'black', 5)
