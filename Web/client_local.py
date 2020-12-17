@@ -3,7 +3,7 @@ import json
 from time import sleep
 
 vis = 1
-current_ip = '127.0.0.1'
+current_ip = '46.138.245.249'
 
 # 1:  add_move(472, "56-58" + ";")
 def add_move(party_id, move):
